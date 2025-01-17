@@ -22,17 +22,9 @@ app.use(cookieParser());
 //   ? JSON.parse(process.env.CORS_ORIGIN)
 //   : ["*"];
 
-app.use(
-  cors({
-    origin: whitelist,
-    credentials: true,
-    maxAge: 14400,
-  })
-);
+app.use(cors());
 
-app.use(cors({}));
-
-app.use("/api/v1/auth", userRoutes);
+app.use("/auth", userRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({

@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-
+const User = require("../models/User");
 const OTP = require("../models/OTP");
 const jwt = require("jsonwebtoken");
 const mailSender = require("../utils/mailSender");
@@ -19,10 +19,12 @@ exports.signup = async (req, res) => {
       password,
       confirmPassword,
       accountType,
-      contactNumber,
+
       otp,
+      companyName,
+      companyId,
     } = req.body;
-    // Check if All Details are there or not
+
     if (
       !firstName ||
       !lastName ||
@@ -36,6 +38,7 @@ exports.signup = async (req, res) => {
         message: "All Fields are required",
       });
     }
+
     // Check if password and confirm password match
     if (password !== confirmPassword) {
       return res.status(400).json({
@@ -56,44 +59,30 @@ exports.signup = async (req, res) => {
 
     // Find the most recent OTP for the email
     const response = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
-    console.log(response);
-    if (response.length === 0) {
-      // OTP not found for the email
-      return res.status(400).json({
-        success: false,
-        message: "The OTP is not valid",
-      });
-    } else if (otp !== response[0].otp) {
-      // Invalid OTP
+    if (response.length === 0 || otp !== response[0].otp) {
       return res.status(400).json({
         success: false,
         message: "The OTP is not valid",
       });
     }
-
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+    // const profileDetails = await Profile.create({
+    //   gender: null,
+    //   dateOfBirth: null,
+    //   about: null,
+    //   contactNumber: null,
+    // });
 
     // Create the user
-    let approved = "";
-    approved === "Instructor" ? (approved = false) : (approved = true);
-
-    // Create the Additional Profile For User
-    const profileDetails = await Profile.create({
-      gender: null,
-      dateOfBirth: null,
-      about: null,
-      contactNumber: null,
-    });
     const user = await User.create({
       firstName,
       lastName,
       email,
-      contactNumber,
       password: hashedPassword,
-      accountType: accountType,
-      approved: approved,
-      additionalDetails: profileDetails._id,
+      accountType,
+      companyName,
+      companyId,
+      // additionalDetails: profileDetails._id,
       image: `https://api.dicebear.com/6.x/initials/svg?seed=${firstName} ${lastName}&backgroundColor=00897b,00acc1,039be5,1e88e5,3949ab,43a047,5e35b1,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,fb8c00,fdd835,ffb300,ffd5dc,ffdfbf,c0aede,d1d4f9,b6e3f4&backgroundType=solid,gradientLinear&backgroundRotation=0,360,-350,-340,-330,-320&fontFamily=Arial&fontWeight=600`,
     });
 
@@ -114,20 +103,16 @@ exports.signup = async (req, res) => {
 // Login controller for authenticating users
 exports.login = async (req, res) => {
   try {
-    // Get email and password from request body
     const { email, password } = req.body;
 
-    // Check if email or password is missing
     if (!email || !password) {
-      // Return 400 Bad Request status code with error message
       return res.status(400).json({
         success: false,
         message: `Please Fill up All the Required Fields`,
       });
     }
 
-    // Find user with provided email
-    const user = await User.findOne({ email }).populate("additionalDetails");
+    const user = await User.findOne({ email });
 
     // If user not found with provided email
     if (!user) {
@@ -170,7 +155,6 @@ exports.login = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    // Return 500 Internal Server Error status code with error message
     return res.status(500).json({
       success: false,
       message: `Login Failure Please Try Again`,
@@ -181,15 +165,9 @@ exports.login = async (req, res) => {
 exports.sendotp = async (req, res) => {
   try {
     const { email } = req.body;
-
-    // Check if user is already present
-    // Find user with provided email
+    console.log(email);
     const checkUserPresent = await User.findOne({ email });
-    // to be used in case of signup
-
-    // If user found with provided email
     if (checkUserPresent) {
-      // Return 401 Unauthorized status code with error message
       return res.status(401).json({
         success: false,
         message: `User is Already Registered`,
