@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { ContainerScroll } from "../ui/container-scroll-animation";
+import LpImg from "../../assets/lp-img.png";
 
 export function HeroScrollDemo() {
   return (
@@ -18,8 +19,7 @@ export function HeroScrollDemo() {
       // }
       >
         <img
-          src="https://ui.aceternity.com/_next/image?url=https%3A%2F%2Fassets.aceternity.com%2Fmacbook-scroll.png&w=1920&q=75"
-          alt="hero"
+          src={LpImg}
           height={720}
           width={1400}
           className="mx-auto rounded-2xl object-cover h-full object-left-top"

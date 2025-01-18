@@ -27,7 +27,7 @@ const Home = () => {
       </div>
 
       <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden z-0 mt-32">
-        <LampDemo></LampDemo>
+        <LampDemo />
       </div>
       <Footer />
     </div>

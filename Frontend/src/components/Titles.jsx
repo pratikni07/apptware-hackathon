@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { motion } from "framer-motion";
 
 // Sample data
 const applications = [
@@ -29,6 +30,16 @@ const getWidthPercentage = (timeStr) => {
   return Math.min((seconds / maxSeconds) * 100, 100);
 };
 
+// Utility function to generate random colors
+const generateRandomColor = () => {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
 const Titles = () => {
   const [showAll, setShowAll] = useState(false);
   const displayedApps = showAll ? applications : applications.slice(0, 5);
@@ -36,22 +47,45 @@ const Titles = () => {
   return (
     <>
       <div className="space-y-2">
-        {displayedApps.map((app, index) => (
-          <div key={index} className="relative rounded-lg overflow-hidden">
-            {/* Background fill (filled portion) */}
-            <div
-              className="absolute top-0 left-0 h-full rounded-lg bg-[#505050]"
-              style={{ width: `${getWidthPercentage(app.time)}%` }}
-            />
-            {/* Unfilled area with transparency */}
-            <div className="absolute top-0 left-0 h-full w-full" />
-            {/* Content */}
-            <div className="relative p-2 flex justify-between items-center text-white">
-              <span className="text-sm">{app.name}</span>
-              <span className="text-xs text-gray-400">{app.time}</span>
+        {displayedApps.map((app, index) => {
+          const progressWidth = getWidthPercentage(app.time);
+          const baseColor = generateRandomColor();
+          return (
+            <div key={index} className="relative rounded-lg overflow-hidden">
+              {/* Static filled portion */}
+              <div
+                className="absolute top-0 left-0 h-full rounded-lg"
+                style={{
+                  width: `${progressWidth}%`,
+                  backgroundColor: baseColor,
+                  overflow: "hidden",
+                }}
+              >
+                {/* Animated gradient effect */}
+                <motion.div
+                  className="h-full w-full"
+                  style={{
+                    background: `linear-gradient(90deg, rgba(255,255,255,0.2) 25%, rgba(0,0,0,0.2) 50%, rgba(255,255,255,0.2) 75%)`,
+                    backgroundSize: "200% 100%",
+                  }}
+                  animate={{
+                    backgroundPosition: ["0% 0%", "200% 0%"],
+                  }}
+                  transition={{
+                    duration: 2,
+                    ease: "linear",
+                    repeat: Infinity,
+                  }}
+                />
+              </div>
+              {/* Content */}
+              <div className="relative p-2 flex justify-between items-center text-white">
+                <span className="text-sm">{app.name}</span>
+                <span className="text-xs text-gray-400">{app.time}</span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       {applications.length > 5 && (
         <div className="flex">
