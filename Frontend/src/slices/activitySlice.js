@@ -10,21 +10,21 @@ const initialState = {
   stats: [],
   timeAnalysis: [],
   daily: [],
-  window: [],
   category: [],
   loading: false,
   error: null,
+  windows:[],
 };
 
 export const fetchUserData = createAsyncThunk("activity/userData", async () => {
   const token=localStorage.getItem("token");
-  console.log('token',token)
+
   const instance = apiConnector("GET", `${BASE_URL2}/userData`, null, {
     Authorization: `Bearer ${token}`,
   }, null);
 
   const resp = await instance;
-  console.log('user',resp.data)
+
   return resp.data;
 });
 
@@ -125,20 +125,22 @@ export const fetchDaily = createAsyncThunk(
 
 export const fetchWindow = createAsyncThunk(
   "activity/fetchWindow",
-  async (date, id) => {
+  async (date) => {
+    const token=localStorage.getItem("token");
     const instance = apiConnector(
       "GET",
       `${BASE_URL2}/getwindow`,
-      {
-        userId: id,
-      },
       null,
+      {
+        Authorization: `Bearer ${token}`,
+      },
       {
         date,
       }
     );
 
     const resp = await instance;
+    console.log(resp.data)
     return resp.data;
   }
 );
@@ -235,7 +237,8 @@ const activitySlice = createSlice({
 
     builder.addCase(fetchWindow.fulfilled, (state, action) => {
       state.loading = false;
-      state.window = action.payload;
+      console.log('windows resp',action.payload)
+      state.windows=action.payload?.data?.windowUsage
     });
 
     builder.addCase(fetchWindow.rejected, (state, action) => {

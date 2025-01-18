@@ -2,7 +2,7 @@ import React, { useState ,useEffect} from "react";
 import Titles from "./Titles";
 import AnimationSunburst from "./AnimationSunburst";
 import { RefreshCcw } from "lucide-react";
-import { fetchUserData } from './../slices/activitySlice';
+import { fetchUserData,fetchWindow } from './../slices/activitySlice';
 import { useDispatch , useSelector} from 'react-redux';
 
 const Dashboard = () => {
@@ -12,11 +12,15 @@ const Dashboard = () => {
   const loading = useSelector((state) => state.activity.loading);
   const error = useSelector((state) => state.activity.error);
   const user = useSelector((state) => state.activity.user);
-  console.log('my user',user);
+
   const activeHours = useSelector((state) => state.activity.activeHours);
   const minutes = useSelector((state) => state.activity.minutes);
   const dispatch = useDispatch();
 
+  const windowsTitles= useSelector((state) => state.activity.windows)
+  console.log('window titles',windowsTitles)
+
+  console.log();
 
   const date= new Date();
   const month = date.toLocaleString('default', { month: 'long' });
@@ -29,6 +33,7 @@ const Dashboard = () => {
 
   useEffect( () => {
      dispatch(fetchUserData());
+     dispatch(fetchWindow(date))
 
   } , [dispatch]);
 
@@ -59,7 +64,10 @@ const Dashboard = () => {
             </div>
           </div>
           <button className="mt-2 flex items-center justify-center py-3 px-2 text-gray-400 hover:text-white transition-colors border border-gray-400 hover:border-white rounded-lg">
-            <span className="mr-1">Refresh</span>
+            <span className="mr-1">Refresh
+
+
+            </span>
             <RefreshCcw size={16} />
           </button>
         </div>
