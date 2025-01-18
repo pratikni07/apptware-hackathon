@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 const activityController = require("../controller/activity.controller");
 const authMiddleware = require("../middlewares/authMiddleware");
-
+const UserActivityController = require("../controller/userActivity");
 // Protect all routes
 router.use(authMiddleware);
 
@@ -14,6 +14,7 @@ router.post("/record", activityController.recordActivity);
 // Get activity history with filters
 router.get("/history", activityController.getActivityHistory);
 
+router.get("/userData",UserActivityController.userData);
 // Get activity statistics
 router.get("/stats", activityController.getActivityStats);
 

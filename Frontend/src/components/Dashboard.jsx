@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Titles from "./Titles";
 import AnimationSunburst from "./AnimationSunburst";
 import { RefreshCcw } from "lucide-react";
-
+import useSele
 const Dashboard = () => {
   const tabs = ["Windows", "MacOS", "Linux"];
   const [activeTab, setActiveTab] = useState("Windows");
