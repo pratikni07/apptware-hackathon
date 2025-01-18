@@ -200,3 +200,41 @@ exports.sendotp = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
+
+exports.getEmployee = async (req, res) => {
+  try {
+    // Get companyId from params
+    const { companyId } = req.params;
+
+    // Find all users who are employees of the specified company
+    const employees = await User.find(
+      {
+        companyId: companyId,
+        accountType: "Employee",
+      },
+      "firstName lastName image _id" // Select only required fields
+    );
+
+    // Check if employees exist
+    if (!employees || employees.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No employees found for this company",
+      });
+    }
+
+    // Return success response with employees data
+    return res.status(200).json({
+      success: true,
+      data: employees,
+      message: "Employees fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch employees",
+      error: error.message,
+    });
+  }
+};
