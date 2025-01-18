@@ -1,8 +1,8 @@
 // const BASE_URL = "http://10.1.0.104:3001";
-export const BASE_URL = "http://10.1.0.110:3000";
+export const BASE_URL = "http://10.1.0.115:3000";
 
 // const BASE_URL2 = "http://localhost:3003/activity";
-export const BASE_URL2 = "http://10.1.0.110:3000/api/tracks/activity";
+export const BASE_URL2 = "http://10.1.0.115:3000/api/tracks/activity";
 
 // AUTH ENDPOINTS
 export const endpoints = {

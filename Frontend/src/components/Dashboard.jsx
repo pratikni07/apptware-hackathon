@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Titles from "./Titles";
 import AnimationSunburst from "./AnimationSunburst";
 import { RefreshCcw } from "lucide-react";
-import { fetchUserData, fetchWindow } from "./../slices/activitySlice";
+import { fetchUserData, fetchWindow , fetchCategoryData} from "./../slices/activitySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
@@ -35,6 +35,15 @@ const Dashboard = () => {
   const macWindows = useSelector((state) => state.activity.macWindows);
   const windowsWindows = useSelector((state) => state.activity.windowsWindows);
 
+
+  const winCategory = useSelector((state) => state.activity.windowsCategory);
+  const linuxCategory = useSelector((state) => state.activity.linuxCategory);
+  const macCategory = useSelector((state) => state.activity.macCategory);
+
+  console.log('categories in dash')
+  console.log(winCategory, linuxCategory, macCategory);
+
+
   useEffect(() => {
     const data = {
       userId: userId,
@@ -44,8 +53,21 @@ const Dashboard = () => {
     if (userId) {
       dispatch(fetchUserData(userId));
       dispatch(fetchWindow(data));
+      dispatch(fetchCategoryData(userId));
     }
   }, [dispatch]);
+
+
+  const handleClick=(e)=>{
+    e.preventDefault()
+    const data = {
+      userId: userId,
+      date: date,
+    };
+    dispatch(fetchUserData(userId));
+    dispatch(fetchWindow(data));
+    dispatch(fetchCategoryData(userId));
+  }
 
   // Function to get the appropriate window data based on active tab
   const getWindowData = () => {
@@ -63,6 +85,12 @@ const Dashboard = () => {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div
+      className="text-red-500 flex items-center justify-center min-h-screen"    
+    >Error: {error}</div>;
   }
 
   const firstName =
@@ -94,7 +122,7 @@ const Dashboard = () => {
                 </span>
               </div>
 
-              <button className="mt-1">
+              <button className="mt-1" onClick={handleClick}>
                 <RefreshCcw size={20} />
               </button>
             </div>

@@ -21,7 +21,26 @@ const initialState = {
   cpu: null,
   memory: null,
   disk: null,
+  windowsCategory:[],
+  linuxCategory:[],
+  macCategory:[],
 };
+
+
+export const fetchCategoryData = createAsyncThunk("activity/category", async (userId) => {
+  const token=localStorage.getItem("token");
+  const instance = apiConnector("GET", `${BASE_URL2}/category`, null, {
+    Authorization: `Bearer ${token}`,
+  }, {
+    userId:userId
+});
+
+  const resp = await instance;
+
+  console.log('category data',resp.data)
+  return resp.data;
+});
+
 
 export const fetchUserData = createAsyncThunk("activity/userData", async (userId) => {
   const token=localStorage.getItem("token");
@@ -291,6 +310,24 @@ const activitySlice = createSlice({
     });
 
     builder.addCase(fetchUserData.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+
+    builder.addCase(fetchCategoryData.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addCase(fetchCategoryData.fulfilled, (state, action) => {
+      state.loading = false;
+      console.log(action.payload)
+      state.windowsCategory = action.payload.data.Windows;
+      state.linuxCategory = action.payload.data.Linux;
+      state.macCategory = action.payload.data.Mac;
+    });
+
+    builder.addCase(fetchCategoryData.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message;
     });
