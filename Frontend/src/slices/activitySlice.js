@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { BASE_URL2 } from "../services/apis";
 import { apiConnector } from "../services/apiconnector";
+import { memo } from "react";
 
 const initialState = {
   user: null,
@@ -17,13 +18,13 @@ const initialState = {
   linuxWindows:[],
   macWindows:[],
   windowsWindows:[],
+  cpu: null,
+  memory: null,
+  disk: null,
 };
 
 export const fetchUserData = createAsyncThunk("activity/userData", async (userId) => {
   const token=localStorage.getItem("token");
-
-  console.log("user id in data",userId)
-
   const instance = apiConnector("GET", `${BASE_URL2}/userData`, null, {
     Authorization: `Bearer ${token}`,
   }, {
@@ -32,6 +33,7 @@ export const fetchUserData = createAsyncThunk("activity/userData", async (userId
 
   const resp = await instance;
 
+  console.log('user data',resp.data)
   return resp.data;
 });
 
@@ -133,8 +135,6 @@ export const fetchDaily = createAsyncThunk(
 export const fetchWindow = createAsyncThunk(
   "activity/fetchWindow",
   async ({date,userId}) => {
-    console.log("date",date)
-    console.log("ndedneinid",userId)
     const token=localStorage.getItem("token");
     const instance = apiConnector(
       "GET",
@@ -285,6 +285,9 @@ const activitySlice = createSlice({
       state.user = action.payload.data.user;
       state.activeHours = action.payload.data.activeHours;
       state.minutes = action.payload.data.minutes;
+      state.cpu = action.payload.data.cpu;
+      state.memory = action.payload.data.memory;
+      state.disk = action.payload.data.disk;
     });
 
     builder.addCase(fetchUserData.rejected, (state, action) => {

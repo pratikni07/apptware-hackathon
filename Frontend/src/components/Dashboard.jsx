@@ -12,7 +12,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("Windows");
 
   const { userId }=useParams();
-  console.log('user Id',userId)
+
 
   const loading = useSelector((state) => state.activity.loading);
   const error = useSelector((state) => state.activity.error);
@@ -35,7 +35,6 @@ const Dashboard = () => {
   const windowsWindows = useSelector((state) => state.activity.windowsWindows);
 
   useEffect(() => {
-
     const data={
       userId:userId,
       date:date

@@ -11,8 +11,15 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("netflix") ||
     windowLower.includes("youtube") ||
     windowLower.includes("prime") ||
+    windowLower.includes("hotstar") ||
+    windowLower.includes("hulu") ||
+    windowLower.includes("disney+") ||
+    windowLower.includes("spotify") ||
     windowLower.includes("vlc") ||
-    windowLower.includes("media player")
+    windowLower.includes("media player") ||
+    windowLower.includes("hbo") ||
+    windowLower.includes("mx player") ||
+    windowLower.includes("plex")
   ) {
     return "entertainment";
   }
@@ -23,7 +30,14 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("instagram") ||
     windowLower.includes("twitter") ||
     windowLower.includes("linkedin") ||
-    windowLower.includes("discord")
+    windowLower.includes("discord") ||
+    windowLower.includes("snapchat") ||
+    windowLower.includes("reddit") ||
+    windowLower.includes("pinterest") ||
+    windowLower.includes("tiktok") ||
+    windowLower.includes("threads") ||
+    windowLower.includes("telegram") ||
+    windowLower.includes("wechat")
   ) {
     return "social_media";
   }
@@ -35,7 +49,17 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("intellij") ||
     windowLower.includes("sublime") ||
     windowLower.includes("terminal") ||
-    windowLower.includes("git")
+    windowLower.includes("git") ||
+    windowLower.includes("github") ||
+    windowLower.includes("visual studio") ||
+    windowLower.includes("pycharm") ||
+    windowLower.includes("eclipse") ||
+    windowLower.includes("xcode") ||
+    windowLower.includes("postman") ||
+    windowLower.includes("android studio") ||
+    windowLower.includes("flutter_activity") ||
+    windowLower.includes("kubernetes") ||
+    windowLower.includes("docker")
   ) {
     return "coding";
   }
@@ -47,19 +71,155 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("powerpoint") ||
     windowLower.includes("notion") ||
     windowLower.includes("docs") ||
-    windowLower.includes("sheets")
+    windowLower.includes("sheets") ||
+    windowLower.includes("slides") ||
+    windowLower.includes("onenote") ||
+    windowLower.includes("todoist") ||
+    windowLower.includes("evernote") ||
+    windowLower.includes("monday.com") ||
+    windowLower.includes("asana")
   ) {
     return "productivity";
+  }
+
+  // Browsers
+  if (
+    windowLower.includes("chrome") ||
+    windowLower.includes("firefox") ||
+    windowLower.includes("safari") ||
+    windowLower.includes("edge") ||
+    windowLower.includes("opera") ||
+    windowLower.includes("brave") ||
+    windowLower.includes("duckduckgo")
+  ) {
+    return "browser";
   }
 
   // Gaming
   if (
     windowLower.includes("steam") ||
     windowLower.includes("game") ||
+    windowLower.includes("valorant") ||
+    windowLower.includes("epic games") ||
+    windowLower.includes("xbox") ||
+    windowLower.includes("playstation") ||
     windowLower.includes("unity") ||
-    windowLower.includes("unreal")
+    windowLower.includes("unreal") ||
+    windowLower.includes("blizzard") ||
+    windowLower.includes("minecraft") ||
+    windowLower.includes("fortnite")
   ) {
     return "gaming";
+  }
+
+  // Education
+  if (
+    windowLower.includes("coursera") ||
+    windowLower.includes("udemy") ||
+    windowLower.includes("khan academy") ||
+    windowLower.includes("edx") ||
+    windowLower.includes("byjus") ||
+    windowLower.includes("unacademy") ||
+    windowLower.includes("whitehat jr") ||
+    windowLower.includes("chegg") ||
+    windowLower.includes("duolingo") ||
+    windowLower.includes("brilliant") ||
+    windowLower.includes("quizlet")
+  ) {
+    return "education";
+  }
+
+  // Finance
+  if (
+    windowLower.includes("paypal") ||
+    windowLower.includes("stripe") ||
+    windowLower.includes("quickbooks") ||
+    windowLower.includes("mint") ||
+    windowLower.includes("venmo") ||
+    windowLower.includes("cashapp") ||
+    windowLower.includes("google pay") ||
+    windowLower.includes("phonepe") ||
+    windowLower.includes("zelle") ||
+    windowLower.includes("finance") ||
+    windowLower.includes("investment") ||
+    windowLower.includes("stocks")
+  ) {
+    return "finance";
+  }
+
+  // Health/Fitness
+  if (
+    windowLower.includes("fitbit") ||
+    windowLower.includes("myfitnesspal") ||
+    windowLower.includes("healthifyme") ||
+    windowLower.includes("strava") ||
+    windowLower.includes("nike run club") ||
+    windowLower.includes("garmin connect") ||
+    windowLower.includes("google fit") ||
+    windowLower.includes("apple health") ||
+    windowLower.includes("calm") ||
+    windowLower.includes("headspace")
+  ) {
+    return "health";
+  }
+
+  // Utilities
+  if (
+    windowLower.includes("calculator") ||
+    windowLower.includes("settings") ||
+    windowLower.includes("task manager") ||
+    windowLower.includes("system info") ||
+    windowLower.includes("notepad") ||
+    windowLower.includes("wordpad") ||
+    windowLower.includes("paint") ||
+    windowLower.includes("control panel") ||
+    windowLower.includes("file explorer") ||
+    windowLower.includes("disk cleanup") ||
+    windowLower.includes("defragment") ||
+    windowLower.includes("device manager") ||
+    windowLower.includes("cmd") ||
+    windowLower.includes("powershell") ||
+    windowLower.includes("terminal") ||
+    windowLower.includes("resource monitor") ||
+    windowLower.includes("event viewer") ||
+    windowLower.includes("snipping tool") ||
+    windowLower.includes("screen recorder") ||
+    windowLower.includes("search") ||
+    windowLower.includes("clock") ||
+    windowLower.includes("alarms") ||
+    windowLower.includes("voice recorder") ||
+    windowLower.includes("magnifier") ||
+    windowLower.includes("sticky notes") ||
+    windowLower.includes("snip & sketch") ||
+    windowLower.includes("print screen") ||
+    windowLower.includes("print") ||
+    windowLower.includes("printers") ||
+    windowLower.includes("network") ||
+    windowLower.includes("network connections") ||
+    windowLower.includes("network settings") ||
+    windowLower.includes("wi-fi") ||
+    windowLower.includes("bluetooth") ||
+    windowLower.includes("backup") ||
+    windowLower.includes("restore") ||
+    windowLower.includes("system restore") ||
+    windowLower.includes("drive")
+  ) {
+    return "utilities";
+  }
+
+  // Communication
+  if (
+    windowLower.includes("whatsapp") ||
+    windowLower.includes("zoom") ||
+    windowLower.includes("skype") ||
+    windowLower.includes("microsoft teams") ||
+    windowLower.includes("google meet") ||
+    windowLower.includes("webex") ||
+    windowLower.includes("slack") ||
+    windowLower.includes("signal") ||
+    windowLower.includes("telegram")
+  ) {
+    return "communication";
   }
 
   return "other";
@@ -104,7 +264,7 @@ const activityController = {
         // Ensure required fields have fallback defaults
         
         const formattedActivityData = {
-            timestamp: new Date(),
+            timestamp: activityData.timestamp,
             system: {
                 platform: activityData.system?.platform || "Unknown",
                 hostname: activityData.system?.hostname || "Unknown",
@@ -402,15 +562,15 @@ getWindowAnalytics: async (req, res) => {
     const { date , userId } = req.query;
     // const { userId } = req.body;
 
-    console.log('date', date);
-    console.log('userId', userId);
 
+    console.log('abcd',new Date())
     // Get start and end of the specified date
     const startDate = new Date(date);
     startDate.setHours(0, 0, 0, 0);
     const endDate = new Date(date);
     endDate.setHours(23, 59, 59, 999);
 
+    console.log(userId, startDate, endDate);
     const activities = await ActivityTracker.find({
       userId,
       timestamp: {
@@ -457,9 +617,6 @@ const linuxWindows = formattedWindowUsage.filter(item => item.system === 'Linux'
 const windowsWindows = formattedWindowUsage.filter(item => item.system === 'Windows');
 const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS');
 
-console.log('Linux:', linuxWindows);
-console.log('Windows:', windowsWindows);
-console.log('MacOS:', macOsWindows);
 
 
     res.status(200).json({

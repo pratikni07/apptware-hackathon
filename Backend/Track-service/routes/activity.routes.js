@@ -25,4 +25,6 @@ router.get("/daily", activityController.getDailyAnalytics);
 router.get("/getwindow", activityController.getWindowAnalytics);
 router.get("/category", activityController.getCategoryAnalytics);
 
+
+
 module.exports = router;
