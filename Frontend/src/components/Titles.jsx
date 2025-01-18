@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { motion } from "framer-motion";
 
 const getTimeInSeconds = (timeStr) => {
   const parts = timeStr.split(" ");
@@ -16,16 +15,13 @@ const getTimeInSeconds = (timeStr) => {
 const getWidthPercentage = (timeStr) => {
   const seconds = getTimeInSeconds(timeStr);
   const maxSeconds = getTimeInSeconds("4h 0m 0s");
-  return Math.min((seconds / maxSeconds) * 1000, 1000);
+  return Math.min((seconds / maxSeconds) * 100, 100);
 };
 
-const generateRandomColor = () => {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
+const generatePastelColor = () => {
+  // Generate pastel colors by using high lightness values
+  const hue = Math.floor(Math.random() * 360);
+  return `hsl(${hue}, 70%, 80%)`;
 };
 
 const Titles = ({ windowData = [] }) => {
@@ -45,36 +41,22 @@ const Titles = ({ windowData = [] }) => {
       <div className="space-y-2">
         {displayedApps?.map((app, index) => {
           const progressWidth = getWidthPercentage(app?.duration?.formatted);
-          const baseColor = generateRandomColor();
           return (
             <div key={index} className="relative rounded-lg overflow-hidden">
               <div
                 className="absolute top-0 left-0 h-full rounded-lg"
                 style={{
                   width: `${progressWidth}%`,
-                  backgroundColor: baseColor,
-                  overflow: "hidden",
+                  backgroundColor: generatePastelColor(),
                 }}
-              >
-                <motion.div
-                  className="h-full w-full"
-                  style={{
-                    background: `linear-gradient(90deg, rgba(255,255,255,0.2) 25%, rgba(0,0,0,0.2) 50%, rgba(255,255,255,0.2) 75%)`,
-                    backgroundSize: "200% 100%",
-                  }}
-                  animate={{
-                    backgroundPosition: ["0% 0%", "200% 0%"],
-                  }}
-                  transition={{
-                    duration: 2,
-                    ease: "linear",
-                    repeat: Infinity,
-                  }}
-                />
-              </div>
+              />
               <div className="relative p-2 flex justify-between items-center text-white">
-                <span className="text-sm truncate whitespace-nowrap overflow-hidden flex-1 pr-4">{app?.window}</span>
-                <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">{app?.duration?.formatted}</span>
+                <span className="text-sm truncate whitespace-nowrap overflow-hidden flex-1 pr-4">
+                  {app?.window}
+                </span>
+                <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
+                  {app?.duration?.formatted}
+                </span>
               </div>
             </div>
           );
