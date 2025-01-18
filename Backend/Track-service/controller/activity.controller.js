@@ -399,8 +399,8 @@ getDailyAnalytics: async (req, res) => {
 
 getWindowAnalytics: async (req, res) => {
   try {
-    const { date } = req.query;
-    const userId = req.user.id;
+    const { date , userId } = req.query;
+    // const { userId } = req.body;
 
     console.log('date', date);
     console.log('userId', userId);

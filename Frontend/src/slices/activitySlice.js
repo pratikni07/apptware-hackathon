@@ -19,12 +19,16 @@ const initialState = {
   windowsWindows:[],
 };
 
-export const fetchUserData = createAsyncThunk("activity/userData", async () => {
+export const fetchUserData = createAsyncThunk("activity/userData", async (userId) => {
   const token=localStorage.getItem("token");
+
+  console.log("user id in data",userId)
 
   const instance = apiConnector("GET", `${BASE_URL2}/userData`, null, {
     Authorization: `Bearer ${token}`,
-  }, null);
+  }, {
+    userId:userId
+});
 
   const resp = await instance;
 
@@ -128,7 +132,9 @@ export const fetchDaily = createAsyncThunk(
 
 export const fetchWindow = createAsyncThunk(
   "activity/fetchWindow",
-  async (date) => {
+  async ({date,userId}) => {
+    console.log("date",date)
+    console.log("ndedneinid",userId)
     const token=localStorage.getItem("token");
     const instance = apiConnector(
       "GET",
@@ -138,7 +144,8 @@ export const fetchWindow = createAsyncThunk(
         Authorization: `Bearer ${token}`,
       },
       {
-        date,
+        date:date,
+        userId: userId,
       }
     );
 

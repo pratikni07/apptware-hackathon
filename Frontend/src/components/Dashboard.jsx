@@ -4,10 +4,15 @@ import AnimationSunburst from "./AnimationSunburst";
 import { RefreshCcw } from "lucide-react";
 import { fetchUserData, fetchWindow } from './../slices/activitySlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from "react-router-dom";
+
 
 const Dashboard = () => {
   const tabs = ["Windows", "MacOS", "Linux"];
   const [activeTab, setActiveTab] = useState("Windows");
+
+  const { userId }=useParams();
+  console.log('user Id',userId)
 
   const loading = useSelector((state) => state.activity.loading);
   const error = useSelector((state) => state.activity.error);
@@ -30,8 +35,16 @@ const Dashboard = () => {
   const windowsWindows = useSelector((state) => state.activity.windowsWindows);
 
   useEffect(() => {
-    dispatch(fetchUserData());
-    dispatch(fetchWindow(date));
+
+    const data={
+      userId:userId,
+      date:date
+    }
+
+    if(userId){
+      dispatch(fetchUserData(userId));
+    dispatch(fetchWindow(data));
+    }
   }, [dispatch]);
 
   // Function to get the appropriate window data based on active tab
@@ -52,13 +65,16 @@ const Dashboard = () => {
     return <div>Loading...</div>;
   }
 
+  const firstName=user?.firstName.charAt(0).toUpperCase() + user?.firstName.slice(1);
+  const lastName=user?.lastName.charAt(0).toUpperCase() + user?.lastName.slice(1);
+
   return (
     <div className="flex justify-center items-center min-h-screen p-8 px-20">
       <div className="bg-[#1c1c1c] w-full border border-zinc-700 shadow-md rounded-lg">
         <div className="p-6 flex items-center justify-between">
           <div className="flex flex-col gap-4">
             <div className="text-white text-4xl">
-              Hi <span className="text-green-500">{user?.firstName} {user?.lastName}</span>!
+              Hi <span className="text-green-500">{firstName} {lastName}</span>!
             </div>
             <div className="text-white text-3xl ">
               Your activity for{" "}

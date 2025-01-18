@@ -16,7 +16,7 @@ function App() {
     <div className="bg-black min-h-screen text-white">
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/:userId" element={<Dashboard />} />
         <Route path="/components" element={<Components />} />
         <Route path="/auth" element={<LoginPage />} />
         <Route path="/code" element={<GitHubRepo />} />

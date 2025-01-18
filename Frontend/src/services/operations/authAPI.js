@@ -106,8 +106,10 @@ export function login(email, password, navigate) {
       dispatch(setUser({ ...response.data.user, image: userImage }));
 
       localStorage.setItem("token", response.data.token);
-      // localStorage.setItem("user", JSON.stringify(response.data.user));
-      navigate("/dashboard");
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+
+      console.log('id', response.data.user._id);
+      navigate(`/dashboard/${response.data.user._id}`);
     } catch (error) {
       console.log("LOGIN API ERROR............", error);
       toast.error("Login Failed");

@@ -3,7 +3,8 @@ const User = require("../models/User");
 
 const UserActivityController={
     userData: async (req,res)=>{
-        const userId = req.user.id;
+        const {userId} = req.query;
+
 
           const user=await User.findById(userId);
           const countActivity= await ActivityTracker.find({userId: userId},
