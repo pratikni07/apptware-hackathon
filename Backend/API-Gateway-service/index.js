@@ -8,18 +8,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Enhanced CORS configuration
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:3002",
-    ],
-    credentials: true,
-  })
-);
+// Add this before your routes
+app.use((req, res, next) => {
+  console.log(`[Request] ${req.method} ${req.url}`);
+  console.log("Body:", req.body);
+  console.log("Headers:", req.headers);
+  next();
+});
 
-app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Enhanced error handling and logging for auth proxy
 const authProxy = createProxyMiddleware({
@@ -47,6 +44,19 @@ const authProxy = createProxyMiddleware({
     proxyReq.setHeader("x-forwarded-for", req.ip);
     console.log(`[Auth Request] ${req.method} ${req.url} -> ${proxyReq.path}`);
   },
+  onProxyReq: (proxyReq, req, res) => {
+    // Handle POST requests with body
+    if (req.method === "POST" && req.body) {
+      const bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader("Content-Type", "application/json");
+      proxyReq.setHeader("Content-Length", Buffer.byteLength(bodyData));
+      // Write body data to the proxy request
+      proxyReq.write(bodyData);
+    }
+
+    proxyReq.setHeader("x-forwarded-for", req.ip);
+    console.log(`[Auth Request] ${req.method} ${req.url} -> ${proxyReq.path}`);
+  },
 });
 
 // Enhanced track service proxy
@@ -65,6 +75,14 @@ const trackProxy = createProxyMiddleware({
       error: err.message,
     });
   },
+  onProxyReq: (proxyReq, req, res) => {
+    if (req.method === "POST" && req.body) {
+      const bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader("Content-Type", "application/json");
+      proxyReq.setHeader("Content-Length", Buffer.byteLength(bodyData));
+      proxyReq.write(bodyData);
+    }
+  },
 });
 
 // Health check endpoint
@@ -72,6 +90,13 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "healthy" });
 });
 
+// Add this before your routes
+app.use((req, res, next) => {
+  console.log(`[Request] ${req.method} ${req.url}`);
+  console.log("Body:", req.body);
+  console.log("Headers:", req.headers);
+  next();
+});
 // Routes
 app.use("/api/auth", authProxy);
 app.use("/api/tracks", trackProxy);
