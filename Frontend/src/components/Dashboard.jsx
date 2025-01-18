@@ -1,11 +1,40 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import Titles from "./Titles";
 import AnimationSunburst from "./AnimationSunburst";
 import { RefreshCcw } from "lucide-react";
-import useSele
+import { fetchUserData } from './../slices/activitySlice';
+import { useDispatch , useSelector} from 'react-redux';
+
 const Dashboard = () => {
   const tabs = ["Windows", "MacOS", "Linux"];
   const [activeTab, setActiveTab] = useState("Windows");
+
+  const loading = useSelector((state) => state.activity.loading);
+  const error = useSelector((state) => state.activity.error);
+  const user = useSelector((state) => state.activity.user);
+  console.log('my user',user);
+  const activeHours = useSelector((state) => state.activity.activeHours);
+  const minutes = useSelector((state) => state.activity.minutes);
+  const dispatch = useDispatch();
+
+
+  const date= new Date();
+  const month = date.toLocaleString('default', { month: 'long' });
+  const day = date.getDate();
+  const year = date.getFullYear();
+
+  const hours = Math.floor(activeHours); // Get the integer part for hours
+
+  const formattedTime = `${hours} hrs ${minutes} min`;
+
+  useEffect( () => {
+     dispatch(fetchUserData());
+
+  } , [dispatch]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen p-8 px-20">
@@ -13,16 +42,19 @@ const Dashboard = () => {
         <div className="p-6 flex items-center justify-between">
           <div className="flex flex-col gap-4">
             <div className="text-white text-4xl">
-              Hi <span className="text-green-500">pratiknikat07@gmail.com</span>
+              Hi <span className="text-green-500">{user?.firstName} {user?.lastName}</span>
               !
             </div>
             <div className="text-white text-3xl ">
               Your activity for{" "}
-              <span className="text-zinc-500">2025-01-18</span> is here!
+              <span className="text-zinc-500">
+                {month} {day}, {year}
+                </span> is here!
             </div>
             <div className="flex">
               <div className="text-white bg-zinc-700 p-2 rounded-lg text-sm">
-                <span className="font-medium">Time active: </span>6h 34m 20s
+                <span className="font-medium">Time active: </span>
+                {formattedTime} 
               </div>
             </div>
           </div>

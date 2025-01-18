@@ -16,9 +16,18 @@ const initialState = {
   error: null,
 };
 
-export const fetUserData = createAsyncThunk("activity/userData", async () => {
-  const instance = api;
+export const fetchUserData = createAsyncThunk("activity/userData", async () => {
+  const token=localStorage.getItem("token");
+  console.log('token',token)
+  const instance = apiConnector("GET", `${BASE_URL2}/userData`, null, {
+    Authorization: `Bearer ${token}`,
+  }, null);
+
+  const resp = await instance;
+  console.log('user',resp.data)
+  return resp.data;
 });
+
 export const fetchActivities = createAsyncThunk(
   "activity/fetchActivities",
   async (startDate, endDate, category, limit, page) => {
@@ -248,6 +257,27 @@ const activitySlice = createSlice({
       state.loading = false;
       state.error = action.error.message;
     });
+
+    builder.addCase(fetchUserData.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+
+    builder.addCase(fetchUserData.fulfilled, (state, action) => {
+      state.loading = false;
+      console.log(action.payload)
+      state.user = action.payload.data.user;
+      state.activeHours = action.payload.data.activeHours;
+      state.minutes = action.payload.data.minutes;
+    });
+
+    builder.addCase(fetchUserData.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+
+
+   
   },
 });
 
