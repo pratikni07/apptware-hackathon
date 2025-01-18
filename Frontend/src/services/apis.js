@@ -1,16 +1,16 @@
 // const BASE_URL = "http://10.1.0.104:3001";
-export const BASE_URL = "http://10.1.0.162:3001";
+export const BASE_URL = "http://10.1.0.115:3000";
 
 // const BASE_URL2 = "http://localhost:3003/activity";
-export const BASE_URL2 = "http://10.1.0.162:3003/activity";
+export const BASE_URL2 = "http://10.1.0.115:3000/api/tracks/activity";
 
 // AUTH ENDPOINTS
 export const endpoints = {
-  SENDOTP_API: BASE_URL + "/auth/sendotp",
-  SIGNUP_API: BASE_URL + "/auth/signup",
-  LOGIN_API: BASE_URL + "/login",
-  RESETPASSTOKEN_API: BASE_URL + "/auth/reset-password-token",
-  RESETPASSWORD_API: BASE_URL + "/auth/reset-password",
+  SENDOTP_API: BASE_URL + "/api/auth/sendotp",
+  SIGNUP_API: BASE_URL + "/api/auth/signup",
+  LOGIN_API: BASE_URL + "/api/auth/login",
+  RESETPASSTOKEN_API: BASE_URL + "/api/auth/reset-password-token",
+  RESETPASSWORD_API: BASE_URL + "api/auth/reset-password",
 };
 
 // PROFILE ENDPOINTS
