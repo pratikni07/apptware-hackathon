@@ -2,17 +2,6 @@ import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { motion } from "framer-motion";
 
-// Sample data
-const applications = [
-  { name: "chrome.exe", time: "3h 39m 4s" },
-  { name: "Code.exe", time: "1h 29m 7s" },
-  { name: "brave.exe", time: "56m 50s" },
-  { name: "explorer.exe", time: "11m 35s" },
-  { name: "msedge.exe", time: "4m 28s" },
-  { name: "spotify.exe", time: "2m 15s" },
-  { name: "discord.exe", time: "1m 30s" },
-];
-
 const getTimeInSeconds = (timeStr) => {
   const parts = timeStr.split(" ");
   let seconds = 0;
@@ -26,11 +15,10 @@ const getTimeInSeconds = (timeStr) => {
 
 const getWidthPercentage = (timeStr) => {
   const seconds = getTimeInSeconds(timeStr);
-  const maxSeconds = getTimeInSeconds("4h 0m 0s"); // Adjust this threshold as needed
-  return Math.min((seconds / maxSeconds) * 100, 100);
+  const maxSeconds = getTimeInSeconds("4h 0m 0s");
+  return Math.min((seconds / maxSeconds) * 1000, 1000);
 };
 
-// Utility function to generate random colors
 const generateRandomColor = () => {
   const letters = "0123456789ABCDEF";
   let color = "#";
@@ -40,19 +28,26 @@ const generateRandomColor = () => {
   return color;
 };
 
-const Titles = () => {
+const Titles = ({ windowData = [] }) => {
   const [showAll, setShowAll] = useState(false);
-  const displayedApps = showAll ? applications : applications.slice(0, 5);
+  const displayedApps = showAll ? windowData : windowData?.slice(0, 5);
+
+  if (!windowData || windowData.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-32 text-gray-400 text-sm bg-zinc-800/50 rounded-lg">
+        No data available for this operating system
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="space-y-2">
-        {displayedApps.map((app, index) => {
-          const progressWidth = getWidthPercentage(app.time);
+        {displayedApps?.map((app, index) => {
+          const progressWidth = getWidthPercentage(app?.duration?.formatted);
           const baseColor = generateRandomColor();
           return (
             <div key={index} className="relative rounded-lg overflow-hidden">
-              {/* Static filled portion */}
               <div
                 className="absolute top-0 left-0 h-full rounded-lg"
                 style={{
@@ -61,7 +56,6 @@ const Titles = () => {
                   overflow: "hidden",
                 }}
               >
-                {/* Animated gradient effect */}
                 <motion.div
                   className="h-full w-full"
                   style={{
@@ -78,16 +72,15 @@ const Titles = () => {
                   }}
                 />
               </div>
-              {/* Content */}
               <div className="relative p-2 flex justify-between items-center text-white">
-                <span className="text-sm">{app.name}</span>
-                <span className="text-xs text-gray-400">{app.time}</span>
+                <span className="text-sm truncate whitespace-nowrap overflow-hidden flex-1 pr-4">{app?.window}</span>
+                <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">{app?.duration?.formatted}</span>
               </div>
             </div>
           );
         })}
       </div>
-      {applications.length > 5 && (
+      {windowData?.length > 5 && (
         <div className="flex">
           <button
             onClick={() => setShowAll(!showAll)}

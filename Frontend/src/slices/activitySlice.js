@@ -14,6 +14,9 @@ const initialState = {
   loading: false,
   error: null,
   windows:[],
+  linuxWindows:[],
+  macWindows:[],
+  windowsWindows:[],
 };
 
 export const fetchUserData = createAsyncThunk("activity/userData", async () => {
@@ -239,6 +242,9 @@ const activitySlice = createSlice({
       state.loading = false;
       console.log('windows resp',action.payload)
       state.windows=action.payload?.data?.windowUsage
+      state.linuxWindows=action.payload?.data?.linuxWindows
+      state.macWindows=action.payload?.data?.macOsWindows
+      state.windowsWindows=action.payload?.data?.windowsWindows
     });
 
     builder.addCase(fetchWindow.rejected, (state, action) => {

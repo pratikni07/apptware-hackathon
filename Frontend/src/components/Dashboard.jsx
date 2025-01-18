@@ -1,9 +1,9 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import Titles from "./Titles";
 import AnimationSunburst from "./AnimationSunburst";
 import { RefreshCcw } from "lucide-react";
-import { fetchUserData,fetchWindow } from './../slices/activitySlice';
-import { useDispatch , useSelector} from 'react-redux';
+import { fetchUserData, fetchWindow } from './../slices/activitySlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Dashboard = () => {
   const tabs = ["Windows", "MacOS", "Linux"];
@@ -17,25 +17,36 @@ const Dashboard = () => {
   const minutes = useSelector((state) => state.activity.minutes);
   const dispatch = useDispatch();
 
-  const windowsTitles= useSelector((state) => state.activity.windows)
-  console.log('window titles',windowsTitles)
-
-  console.log();
-
-  const date= new Date();
+  const date = new Date();
   const month = date.toLocaleString('default', { month: 'long' });
   const day = date.getDate();
   const year = date.getFullYear();
 
-  const hours = Math.floor(activeHours); // Get the integer part for hours
-
+  const hours = Math.floor(activeHours);
   const formattedTime = `${hours} hrs ${minutes} min`;
 
-  useEffect( () => {
-     dispatch(fetchUserData());
-     dispatch(fetchWindow(date))
+  const linuxWindows = useSelector((state) => state.activity.linuxWindows);
+  const macWindows = useSelector((state) => state.activity.macWindows);
+  const windowsWindows = useSelector((state) => state.activity.windowsWindows);
 
-  } , [dispatch]);
+  useEffect(() => {
+    dispatch(fetchUserData());
+    dispatch(fetchWindow(date));
+  }, [dispatch]);
+
+  // Function to get the appropriate window data based on active tab
+  const getWindowData = () => {
+    switch (activeTab) {
+      case "Linux":
+        return linuxWindows;
+      case "MacOS":
+        return macWindows;
+      case "Windows":
+        return windowsWindows;
+      default:
+        return windowsWindows;
+    }
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -47,27 +58,23 @@ const Dashboard = () => {
         <div className="p-6 flex items-center justify-between">
           <div className="flex flex-col gap-4">
             <div className="text-white text-4xl">
-              Hi <span className="text-green-500">{user?.firstName} {user?.lastName}</span>
-              !
+              Hi <span className="text-green-500">{user?.firstName} {user?.lastName}</span>!
             </div>
             <div className="text-white text-3xl ">
               Your activity for{" "}
               <span className="text-zinc-500">
                 {month} {day}, {year}
-                </span> is here!
+              </span> is here!
             </div>
             <div className="flex">
               <div className="text-white bg-zinc-700 p-2 rounded-lg text-sm">
                 <span className="font-medium">Time active: </span>
-                {formattedTime} 
+                {formattedTime}
               </div>
             </div>
           </div>
           <button className="mt-2 flex items-center justify-center py-3 px-2 text-gray-400 hover:text-white transition-colors border border-gray-400 hover:border-white rounded-lg">
-            <span className="mr-1">Refresh
-
-
-            </span>
+            <span className="mr-1">Refresh</span>
             <RefreshCcw size={16} />
           </button>
         </div>
@@ -81,15 +88,15 @@ const Dashboard = () => {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`
-                py-4 px-6 text-sm font-medium leading-5 
-                ${
-                  activeTab === tab
-                    ? "border-b-2 border-blue-500 text-blue-400"
-                    : "text-gray-400 hover:text-gray-300 hover:border-gray-700"
-                }
-                focus:outline-none focus:text-blue-400 focus:border-blue-400
-                transition duration-150 ease-in-out
-              `}
+                    py-4 px-6 text-sm font-medium leading-5 
+                    ${
+                      activeTab === tab
+                        ? "border-b-2 border-blue-500 text-blue-400"
+                        : "text-gray-400 hover:text-gray-300 hover:border-gray-700"
+                    }
+                    focus:outline-none focus:text-blue-400 focus:border-blue-400
+                    transition duration-150 ease-in-out
+                  `}
                 >
                   {tab}
                 </button>
@@ -97,10 +104,11 @@ const Dashboard = () => {
             </nav>
           </div>
 
+          {/* Tab Content */}
           <div className="border-t border-zinc-700 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="w-full max-w-md p-6 rounded-lg">
-              <h2 className="text-xl text-white mb-4">Top Window Titles</h2>
-              <Titles />
+              <h2 className="text-xl text-white mb-4">Top {activeTab} Titles</h2>
+              <Titles windowData={getWindowData()} />
             </div>
 
             <div className="w-full max-w-md p-6 rounded-lg">

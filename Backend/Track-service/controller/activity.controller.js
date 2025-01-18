@@ -427,12 +427,13 @@ getWindowAnalytics: async (req, res) => {
     activities.forEach((activity) => {
       const activeWindow = activity.input_activity.active_window;
       const duration = activity.session_info.session_duration;
-
+      const system = activity.system.platform;
       if (activeWindow) {
         windowUsage[activeWindow] = windowUsage[activeWindow] || {
           totalDuration: 0,
           category: activity.category,
           lastActive: activity.timestamp,
+          system: system,
         };
         windowUsage[activeWindow].totalDuration += duration;
         totalTime += duration;
@@ -441,16 +442,25 @@ getWindowAnalytics: async (req, res) => {
 
     // Format the window usage data
     const formattedWindowUsage = Object.entries(windowUsage)
-      .map(([window, data]) => ({
-        window,
-        category: data.category,
-        duration: formatDuration(data.totalDuration),
-        percentage: ((data.totalDuration / totalTime) * 100).toFixed(2),
-        lastActive: data.lastActive,
-      }))
-      .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));
+  .map(([window, data]) => ({
+    window,
+    category: data.category,
+    duration: formatDuration(data.totalDuration),
+    percentage: ((data.totalDuration / totalTime) * 100).toFixed(2),
+    lastActive: data.lastActive,
+    system: data.system, // Include system information
+  }))
+  .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));
 
-    console.log('formattedWindowUsage', formattedWindowUsage);
+// Create separate arrays for Linux, Windows, and MacOS
+const linuxWindows = formattedWindowUsage.filter(item => item.system === 'Linux');
+const windowsWindows = formattedWindowUsage.filter(item => item.system === 'Windows');
+const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS');
+
+console.log('Linux:', linuxWindows);
+console.log('Windows:', windowsWindows);
+console.log('MacOS:', macOsWindows);
+
 
     res.status(200).json({
       success: true,
@@ -458,6 +468,9 @@ getWindowAnalytics: async (req, res) => {
         date,
         userId,
         windowUsage: formattedWindowUsage,
+        linuxWindows: linuxWindows,
+        windowsWindows: windowsWindows,
+        macOsWindows: macOsWindows,
         summary: {
           totalActiveTime: formatDuration(totalTime),
           totalWindows: formattedWindowUsage.length,
