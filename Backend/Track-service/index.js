@@ -2,7 +2,7 @@ const express = require("express");
 
 const app = express();
 
-// const userRoutes = require("./routes/User");
+const activityRoutes = require("./routes/activity.routes");
 
 const database = require("./config/database");
 const cookieParser = require("cookie-parser");
@@ -24,7 +24,7 @@ app.use(cookieParser());
 
 app.use(cors());
 
-// app.use("/", userRoutes);
+app.use("/activity", activityRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({
