@@ -165,7 +165,8 @@ const Dashboard = () => {
               <h2 className="text-xl text-white mb-4">
                 Breakdown in categories
               </h2>
-              <AnimationSunburst />
+              <Titles windowData={getWindowData()} />
+              {/* <AnimationSunburst /> */}
             </div>
           </div>
         </div>

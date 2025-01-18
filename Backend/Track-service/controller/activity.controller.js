@@ -243,332 +243,331 @@ const activityController = {
   // Record new activity
   recordActivity: async (req, res) => {
     try {
-        const userId = req.user.id;
-        const activityData = req.body;
+      const userId = req.user.id;
+      const activityData = req.body;
 
-        
-        activityData.userId = userId;
-        activityData.category = determineCategory(
-            activityData.input_activity?.active_window || "Unknown"
-        );
+      activityData.userId = userId;
+      activityData.category = determineCategory(
+        activityData.input_activity?.active_window || "Unknown"
+      );
 
-        // Add time tracking data with default values
-        activityData.timeTracking = {
-            startTime: new Date(),
-            duration: activityData.session_info?.session_duration || 0,
-            isActive: activityData.session_info?.is_idle === false,
-            lastActiveTime: new Date(),
-            activeWindowDuration: {},
-        };
+      // Add time tracking data with default values
+      activityData.timeTracking = {
+        startTime: new Date(),
+        duration: activityData.session_info?.session_duration || 0,
+        isActive: activityData.session_info?.is_idle === false,
+        lastActiveTime: new Date(),
+        activeWindowDuration: {},
+      };
 
-        // Ensure required fields have fallback defaults
-        
-        const formattedActivityData = {
-            timestamp: activityData.timestamp,
-            system: {
-                platform: activityData.system?.platform || "Unknown",
-                hostname: activityData.system?.hostname || "Unknown",
-            },
-            performance: {
-                cpu_percent: activityData.performance?.cpu_percent ?? 0,
-                memory_percent: activityData.performance?.memory_percent ?? 0,
-                disk_percent: activityData.performance?.disk_percent ?? 0,
-            },
-            power: {
-                battery_percent: activityData.power?.battery_percent ?? 0,
-                power_plugged: activityData.power?.power_plugged ?? false,
-                battery_time_left: activityData.power?.battery_time_left ?? 0,
-            },
-            input_activity: {
-                active_window: activityData.input_activity?.active_window || "Unknown",
-            },
-            session_info: {
-                idle_time: activityData.session_info?.idle_time ?? 0,
-                is_idle: activityData.session_info?.is_idle ?? true,
-                session_duration: activityData.session_info?.session_duration ?? 0,
-            },
-            timeTracking: activityData.timeTracking,
-            userId: activityData.userId,
-            category: activityData.category,
-        };
+      // Ensure required fields have fallback defaults
 
-        // Create and save the activity
-        const activity = new ActivityTracker(formattedActivityData);
-        await activity.save();
+      const formattedActivityData = {
+        timestamp: activityData.timestamp,
+        system: {
+          platform: activityData.system?.platform || "Unknown",
+          hostname: activityData.system?.hostname || "Unknown",
+        },
+        performance: {
+          cpu_percent: activityData.performance?.cpu_percent ?? 0,
+          memory_percent: activityData.performance?.memory_percent ?? 0,
+          disk_percent: activityData.performance?.disk_percent ?? 0,
+        },
+        power: {
+          battery_percent: activityData.power?.battery_percent ?? 0,
+          power_plugged: activityData.power?.power_plugged ?? false,
+          battery_time_left: activityData.power?.battery_time_left ?? 0,
+        },
+        input_activity: {
+          active_window:
+            activityData.input_activity?.active_window || "Unknown",
+        },
+        session_info: {
+          idle_time: activityData.session_info?.idle_time ?? 0,
+          is_idle: activityData.session_info?.is_idle ?? true,
+          session_duration: activityData.session_info?.session_duration ?? 0,
+        },
+        timeTracking: activityData.timeTracking,
+        userId: activityData.userId,
+        category: activityData.category,
+      };
 
-        // Update the user's activity tracker reference
-        await User.findOneAndUpdate(
-            { userId },
-            { activityTracker: activity._id },
-            { new: true }
-        );
+      // Create and save the activity
+      const activity = new ActivityTracker(formattedActivityData);
+      await activity.save();
 
-        res.status(201).json({
-            success: true,
-            data: activity,
-            category: activity.category,
-        });
+      // Update the user's activity tracker reference
+      await User.findOneAndUpdate(
+        { userId },
+        { activityTracker: activity._id },
+        { new: true }
+      );
+
+      res.status(201).json({
+        success: true,
+        data: activity,
+        category: activity.category,
+      });
     } catch (error) {
-        console.error("Error in recordActivity:", error);
-        res.status(500).json({
-            success: false,
-            error: error.message,
-            details: error.stack,
-        });
+      console.error("Error in recordActivity:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        details: error.stack,
+      });
     }
-},
+  },
 
   getTimeAnalytics: async (req, res) => {
     try {
-        const { startDate, endDate, groupBy = "day" } = req.query;
-        const userId = req.user.id;
+      const { startDate, endDate, groupBy = "day" } = req.query;
+      const userId = req.user.id;
 
-        const query = {
-            userId: userId,
+      const query = {
+        userId: userId,
+      };
+
+      if (startDate && endDate) {
+        query.timestamp = {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate),
         };
-
-        if (startDate && endDate) {
-            query.timestamp = {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate),
-            };
-        }
-
-        const activities = await ActivityTracker.find(query);
-
-        // Initialize time tracking objects
-        const timeByCategory = {};
-        const timeByDay = {};
-        const timeByHour = {};
-
-        activities.forEach((activity) => {
-            const date = activity.timestamp.toISOString().split("T")[0];
-            const hour = activity.timestamp.getHours();
-            const duration = activity.session_info.session_duration; // Using session_info for duration
-            const category = activity.category;
-
-            // Track time by category
-            timeByCategory[category] = (timeByCategory[category] || 0) + duration;
-
-            // Track time by day
-            timeByDay[date] = (timeByDay[date] || 0) + duration;
-
-            // Track time by hour
-            timeByHour[hour] = (timeByHour[hour] || 0) + duration;
-        });
-
-        // Format the results
-        const formattedResults = {
-            userId: userId, // Include userId in response
-            byCategory: Object.entries(timeByCategory).map(
-                ([category, duration]) => ({
-                    category,
-                    ...formatDuration(duration),
-                    rawDuration: duration,
-                })
-            ),
-            byDay: Object.entries(timeByDay).map(([date, duration]) => ({
-                date,
-                ...formatDuration(duration),
-                rawDuration: duration,
-            })),
-            byHour: Object.entries(timeByHour).map(([hour, duration]) => ({
-                hour: parseInt(hour),
-                ...formatDuration(duration),
-                rawDuration: duration,
-            })),
-            total: formatDuration(
-                Object.values(timeByCategory).reduce((a, b) => a + b, 0)
-            ),
-        };
-
-        // Calculate productivity metrics
-        const productiveCategories = ["coding", "productivity"];
-        const productiveTime = productiveCategories.reduce(
-            (total, category) => total + (timeByCategory[category] || 0),
-            0
-        );
-        const totalTime = Object.values(timeByCategory).reduce(
-            (a, b) => a + b,
-            0
-        );
-
-        formattedResults.productivityMetrics = {
-            productiveTime: formatDuration(productiveTime),
-            productivityPercentage: totalTime
-                ? ((productiveTime / totalTime) * 100).toFixed(2)
-                : 0,
-            mostProductiveDay: formattedResults.byDay.reduce((a, b) =>
-                a.rawDuration > b.rawDuration ? a : b
-            ).date,
-            mostProductiveHour: formattedResults.byHour.reduce((a, b) =>
-                a.rawDuration > b.rawDuration ? a : b
-            ).hour,
-        };
-
-        res.status(200).json({
-            success: true,
-            data: formattedResults,
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message,
-        });
-    }
-},
-getDailyAnalytics: async (req, res) => {
-  try {
-    const { date } = req.query;
-    const userId = req.user.id;
-    console.log(userId, date);
-
-    // Get start and end of the specified date
-    const startDate = new Date(date);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(date);
-    endDate.setHours(23, 59, 59, 999);
-
-    const activities = await ActivityTracker.find({
-      userId,
-      timestamp: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    });
-
-    // Initialize analytics objects
-    const hourlyBreakdown = Array(24)
-      .fill(0)
-      .map(() => ({
-        total: 0,
-        byCategory: {},
-      }));
-
-    const categoryBreakdown = {
-      total: 0,
-      categories: {},
-      activeWindows: {},
-    };
-
-    // Process activities
-    activities.forEach((activity) => {
-      const hour = activity.timestamp.getHours();
-      const duration = activity.session_info.session_duration;
-      const category = activity.category;
-      const activeWindow = activity.input_activity.active_window;
-
-      // Update hourly breakdown
-      hourlyBreakdown[hour].total += duration;
-      hourlyBreakdown[hour].byCategory[category] =
-        (hourlyBreakdown[hour].byCategory[category] || 0) + duration;
-
-      // Update category breakdown
-      categoryBreakdown.total += duration;
-      categoryBreakdown.categories[category] =
-        (categoryBreakdown.categories[category] || 0) + duration;
-
-      // Track time per active window
-      if (activeWindow) {
-        categoryBreakdown.activeWindows[activeWindow] =
-          (categoryBreakdown.activeWindows[activeWindow] || 0) + duration;
       }
-    });
 
-    // Format durations and calculate percentages
-    const formattedHourlyBreakdown = hourlyBreakdown.map((hour, index) => ({
-      hour: index,
-      total: formatDuration(hour.total),
-      byCategory: Object.entries(hour.byCategory).map(([cat, dur]) => ({
-        category: cat,
-        duration: formatDuration(dur),
-        percentage: ((dur / hour.total) * 100).toFixed(2),
-      })),
-    }));
+      const activities = await ActivityTracker.find(query);
 
-    const formattedCategoryBreakdown = {
-      total: formatDuration(categoryBreakdown.total),
-      categories: Object.entries(categoryBreakdown.categories).map(
-        ([cat, dur]) => ({
+      // Initialize time tracking objects
+      const timeByCategory = {};
+      const timeByDay = {};
+      const timeByHour = {};
+
+      activities.forEach((activity) => {
+        const date = activity.timestamp.toISOString().split("T")[0];
+        const hour = activity.timestamp.getHours();
+        const duration = activity.session_info.session_duration; // Using session_info for duration
+        const category = activity.category;
+
+        // Track time by category
+        timeByCategory[category] = (timeByCategory[category] || 0) + duration;
+
+        // Track time by day
+        timeByDay[date] = (timeByDay[date] || 0) + duration;
+
+        // Track time by hour
+        timeByHour[hour] = (timeByHour[hour] || 0) + duration;
+      });
+
+      // Format the results
+      const formattedResults = {
+        userId: userId, // Include userId in response
+        byCategory: Object.entries(timeByCategory).map(
+          ([category, duration]) => ({
+            category,
+            ...formatDuration(duration),
+            rawDuration: duration,
+          })
+        ),
+        byDay: Object.entries(timeByDay).map(([date, duration]) => ({
+          date,
+          ...formatDuration(duration),
+          rawDuration: duration,
+        })),
+        byHour: Object.entries(timeByHour).map(([hour, duration]) => ({
+          hour: parseInt(hour),
+          ...formatDuration(duration),
+          rawDuration: duration,
+        })),
+        total: formatDuration(
+          Object.values(timeByCategory).reduce((a, b) => a + b, 0)
+        ),
+      };
+
+      // Calculate productivity metrics
+      const productiveCategories = ["coding", "productivity"];
+      const productiveTime = productiveCategories.reduce(
+        (total, category) => total + (timeByCategory[category] || 0),
+        0
+      );
+      const totalTime = Object.values(timeByCategory).reduce(
+        (a, b) => a + b,
+        0
+      );
+
+      formattedResults.productivityMetrics = {
+        productiveTime: formatDuration(productiveTime),
+        productivityPercentage: totalTime
+          ? ((productiveTime / totalTime) * 100).toFixed(2)
+          : 0,
+        mostProductiveDay: formattedResults.byDay.reduce((a, b) =>
+          a.rawDuration > b.rawDuration ? a : b
+        ).date,
+        mostProductiveHour: formattedResults.byHour.reduce((a, b) =>
+          a.rawDuration > b.rawDuration ? a : b
+        ).hour,
+      };
+
+      res.status(200).json({
+        success: true,
+        data: formattedResults,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  },
+  getDailyAnalytics: async (req, res) => {
+    try {
+      const { date } = req.query;
+      const userId = req.user.id;
+      console.log(userId, date);
+
+      // Get start and end of the specified date
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+
+      const activities = await ActivityTracker.find({
+        userId,
+        timestamp: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      });
+
+      // Initialize analytics objects
+      const hourlyBreakdown = Array(24)
+        .fill(0)
+        .map(() => ({
+          total: 0,
+          byCategory: {},
+        }));
+
+      const categoryBreakdown = {
+        total: 0,
+        categories: {},
+        activeWindows: {},
+      };
+
+      // Process activities
+      activities.forEach((activity) => {
+        const hour = activity.timestamp.getHours();
+        const duration = activity.session_info.session_duration;
+        const category = activity.category;
+        const activeWindow = activity.input_activity.active_window;
+
+        // Update hourly breakdown
+        hourlyBreakdown[hour].total += duration;
+        hourlyBreakdown[hour].byCategory[category] =
+          (hourlyBreakdown[hour].byCategory[category] || 0) + duration;
+
+        // Update category breakdown
+        categoryBreakdown.total += duration;
+        categoryBreakdown.categories[category] =
+          (categoryBreakdown.categories[category] || 0) + duration;
+
+        // Track time per active window
+        if (activeWindow) {
+          categoryBreakdown.activeWindows[activeWindow] =
+            (categoryBreakdown.activeWindows[activeWindow] || 0) + duration;
+        }
+      });
+
+      // Format durations and calculate percentages
+      const formattedHourlyBreakdown = hourlyBreakdown.map((hour, index) => ({
+        hour: index,
+        total: formatDuration(hour.total),
+        byCategory: Object.entries(hour.byCategory).map(([cat, dur]) => ({
           category: cat,
           duration: formatDuration(dur),
-          percentage: ((dur / categoryBreakdown.total) * 100).toFixed(2),
-        })
-      ),
-      activeWindows: Object.entries(categoryBreakdown.activeWindows)
-        .map(([window, dur]) => ({
-          window,
-          duration: formatDuration(dur),
-          percentage: ((dur / categoryBreakdown.total) * 100).toFixed(2),
-        }))
-        .sort((a, b) => b.percentage - a.percentage)
-        .slice(0, 10), // Top 10 active windows
-    };
+          percentage: ((dur / hour.total) * 100).toFixed(2),
+        })),
+      }));
 
-    // Calculate productivity metrics
-    const productiveCategories = ["coding", "productivity"];
-    const productiveTime = productiveCategories.reduce((total, category) => {
-      return total + (categoryBreakdown.categories[category] || 0);
-    }, 0);
+      const formattedCategoryBreakdown = {
+        total: formatDuration(categoryBreakdown.total),
+        categories: Object.entries(categoryBreakdown.categories).map(
+          ([cat, dur]) => ({
+            category: cat,
+            duration: formatDuration(dur),
+            percentage: ((dur / categoryBreakdown.total) * 100).toFixed(2),
+          })
+        ),
+        activeWindows: Object.entries(categoryBreakdown.activeWindows)
+          .map(([window, dur]) => ({
+            window,
+            duration: formatDuration(dur),
+            percentage: ((dur / categoryBreakdown.total) * 100).toFixed(2),
+          }))
+          .sort((a, b) => b.percentage - a.percentage)
+          .slice(0, 10), // Top 10 active windows
+      };
 
-    const productivityMetrics = {
-      productiveTime: formatDuration(productiveTime),
-      productivityPercentage: (
-        (productiveTime / categoryBreakdown.total) *
-        100
-      ).toFixed(2),
-      mostProductiveHour: formattedHourlyBreakdown.sort(
-        (a, b) => b.total.rawDuration - a.total.rawDuration
-      )[0]?.hour,
-      mostUsedCategory: formattedCategoryBreakdown.categories.sort(
-        (a, b) => b.percentage - a.percentage
-      )[0],
-    };
+      // Calculate productivity metrics
+      const productiveCategories = ["coding", "productivity"];
+      const productiveTime = productiveCategories.reduce((total, category) => {
+        return total + (categoryBreakdown.categories[category] || 0);
+      }, 0);
 
-    // Get activity patterns
-    const activityPatterns = {
-      morningActivity: calculatePeriodActivity(hourlyBreakdown, 5, 11),
-      afternoonActivity: calculatePeriodActivity(hourlyBreakdown, 12, 17),
-      eveningActivity: calculatePeriodActivity(hourlyBreakdown, 18, 23),
-    };
+      const productivityMetrics = {
+        productiveTime: formatDuration(productiveTime),
+        productivityPercentage: (
+          (productiveTime / categoryBreakdown.total) *
+          100
+        ).toFixed(2),
+        mostProductiveHour: formattedHourlyBreakdown.sort(
+          (a, b) => b.total.rawDuration - a.total.rawDuration
+        )[0]?.hour,
+        mostUsedCategory: formattedCategoryBreakdown.categories.sort(
+          (a, b) => b.percentage - a.percentage
+        )[0],
+      };
 
-    res.status(200).json({
-      success: true,
-      data: {
-        date,
-        userId,
-        hourlyBreakdown: formattedHourlyBreakdown,
-        categoryBreakdown: formattedCategoryBreakdown,
-        productivityMetrics,
-        activityPatterns,
-        summary: {
-          totalActiveTime: formatDuration(categoryBreakdown.total),
-          totalCategories: Object.keys(categoryBreakdown.categories).length,
-          uniqueApplications: Object.keys(categoryBreakdown.activeWindows)
-            .length,
+      // Get activity patterns
+      const activityPatterns = {
+        morningActivity: calculatePeriodActivity(hourlyBreakdown, 5, 11),
+        afternoonActivity: calculatePeriodActivity(hourlyBreakdown, 12, 17),
+        eveningActivity: calculatePeriodActivity(hourlyBreakdown, 18, 23),
+      };
+
+      res.status(200).json({
+        success: true,
+        data: {
+          date,
+          userId,
+          hourlyBreakdown: formattedHourlyBreakdown,
+          categoryBreakdown: formattedCategoryBreakdown,
+          productivityMetrics,
+          activityPatterns,
+          summary: {
+            totalActiveTime: formatDuration(categoryBreakdown.total),
+            totalCategories: Object.keys(categoryBreakdown.categories).length,
+            uniqueApplications: Object.keys(categoryBreakdown.activeWindows)
+              .length,
+          },
         },
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-},
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  },
 
-getWindowAnalytics: async (req, res) => {
-  try {
-    const { date , userId } = req.query;
-    // const { userId } = req.body;
+  getWindowAnalytics: async (req, res) => {
+    try {
+      const { date, userId } = req.query;
+      // const { userId } = req.body;
 
-
-    console.log('abcd',new Date())
-    // Get start and end of the specified date
-    const startDate = new Date(date);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(date);
-    endDate.setHours(23, 59, 59, 999);
+      console.log("abcd", new Date());
+      // Get start and end of the specified date
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
 
     console.log(userId, startDate, endDate);
     const activities = await ActivityTracker.find({
@@ -749,7 +748,7 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
         query.category = category;
       }
 
-      console.log(query)
+      console.log(query);
       const skip = (page - 1) * limit;
 
       const activities = await ActivityTracker.find(query)
@@ -758,10 +757,10 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
         .limit(parseInt(limit))
         .lean();
 
-        console.log(activities);
+      console.log(activities);
       // Add formatted duration to each activity
       const activitiesWithFormattedTime = activities.map((activity) => ({
-        ...activity
+        ...activity,
         // formattedDuration: formatDuration(activity.timeTracking?.duration || 0),
       }));
 
@@ -783,7 +782,6 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
       });
     }
   },
-
 
   // Get activity statistics with time tracking
   getActivityStats: async (req, res) => {
@@ -874,7 +872,6 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
       });
     }
   },
-
 };
 
 function calculatePeriodActivity(hourlyBreakdown, startHour, endHour) {
