@@ -3,9 +3,9 @@ import { BASE_URL2 } from "../services/apis";
 import { apiConnector } from "../services/apiconnector";
 
 const initialState = {
-  user=null,
-  activeHours=null,
-  minutes=null,
+  user: null,
+  activeHours: null,
+  minutes: null,
   activities: [],
   stats: [],
   timeAnalysis: [],
@@ -16,11 +16,9 @@ const initialState = {
   error: null,
 };
 
-export const fetUserData=createAsyncThunk(
-"activity/userData",async ()=>{
-  const instance =api
-}
-);
+export const fetUserData = createAsyncThunk("activity/userData", async () => {
+  const instance = api;
+});
 export const fetchActivities = createAsyncThunk(
   "activity/fetchActivities",
   async (startDate, endDate, category, limit, page) => {
