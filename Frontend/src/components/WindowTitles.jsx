@@ -29,13 +29,13 @@ const getWidthPercentage = (timeStr) => {
   return Math.min((seconds / maxSeconds) * 100, 100);
 };
 
-const WindowTiles = () => {
+const WindowTitles = () => {
   const [showAll, setShowAll] = useState(false);
   const displayedApps = showAll ? applications : applications.slice(0, 5);
 
   return (
-    <div className="w-full max-w-md bg-[#1c1c1c] p-6 rounded-lg">
-      <h2 className="text-xl text-white mb-4">Top Applications</h2>
+    <div className="w-full max-w-md p-6 rounded-lg">
+      <h2 className="text-xl text-white mb-4">Top Window Titles</h2>
       <div className="space-y-2">
         {displayedApps.map((app, index) => (
           <div key={index} className="relative rounded-lg overflow-hidden">
@@ -69,4 +69,4 @@ const WindowTiles = () => {
   );
 };
 
-export default WindowTiles;
+export default WindowTitles;

@@ -17,7 +17,7 @@ const Header = () => {
         Linux. Make data-driven decisions with comprehensive insights.
       </p>
       <button
-        onClick={() => navigate("/signup")}
+        onClick={() => navigate("/auth")}
         className="bg-transparent font-m bg-white text-gray-800  py-1 px-3 rounded-full mt-12 w-32 h-12 font-medium"
       >
         Get started {">"}

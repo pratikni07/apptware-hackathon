@@ -9,6 +9,7 @@ import "animate.css";
 
 import AboutUs from "./components/Aboutus";
 import Dashboard from "./components/Dashboard";
+import LoginPage from "./components/Auth";
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/components" element={<Components />} />
-        <Route path="/aboutus" element={<AboutUs />} />
+        <Route path="/auth" element={<LoginPage />} />
         <Route path="/code" element={<GitHubRepo />} />
         <Route path="/code/:componentName" element={<GitHubRepo />} />
       </Routes>
