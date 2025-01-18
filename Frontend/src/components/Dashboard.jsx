@@ -2,17 +2,15 @@ import React, { useState, useEffect } from "react";
 import Titles from "./Titles";
 import AnimationSunburst from "./AnimationSunburst";
 import { RefreshCcw } from "lucide-react";
-import { fetchUserData, fetchWindow } from './../slices/activitySlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserData, fetchWindow } from "./../slices/activitySlice";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-
 
 const Dashboard = () => {
   const tabs = ["Windows", "MacOS", "Linux"];
   const [activeTab, setActiveTab] = useState("Windows");
 
-  const { userId }=useParams();
-  console.log('user Id',userId)
+  const { userId } = useParams();
 
   const loading = useSelector((state) => state.activity.loading);
   const error = useSelector((state) => state.activity.error);
@@ -23,27 +21,29 @@ const Dashboard = () => {
   const dispatch = useDispatch();
 
   const date = new Date();
-  const month = date.toLocaleString('default', { month: 'long' });
+  const month = date.toLocaleString("default", { month: "long" });
   const day = date.getDate();
   const year = date.getFullYear();
 
   const hours = Math.floor(activeHours);
-  const formattedTime = `${hours} hrs ${minutes} min`;
+  const roundedMinutes = Math.floor(minutes);
+  const seconds = Math.round((minutes - roundedMinutes) * 60);
+
+  const formattedTime = `${hours} hr ${roundedMinutes} min ${seconds} sec`;
 
   const linuxWindows = useSelector((state) => state.activity.linuxWindows);
   const macWindows = useSelector((state) => state.activity.macWindows);
   const windowsWindows = useSelector((state) => state.activity.windowsWindows);
 
   useEffect(() => {
+    const data = {
+      userId: userId,
+      date: date,
+    };
 
-    const data={
-      userId:userId,
-      date:date
-    }
-
-    if(userId){
+    if (userId) {
       dispatch(fetchUserData(userId));
-    dispatch(fetchWindow(data));
+      dispatch(fetchWindow(data));
     }
   }, [dispatch]);
 
@@ -65,34 +65,40 @@ const Dashboard = () => {
     return <div>Loading...</div>;
   }
 
-  const firstName=user?.firstName.charAt(0).toUpperCase() + user?.firstName.slice(1);
-  const lastName=user?.lastName.charAt(0).toUpperCase() + user?.lastName.slice(1);
+  const firstName =
+    user?.firstName.charAt(0).toUpperCase() + user?.firstName.slice(1);
+  const lastName =
+    user?.lastName.charAt(0).toUpperCase() + user?.lastName.slice(1);
 
   return (
-    <div className="flex justify-center items-center min-h-screen p-8 px-20">
-      <div className="bg-[#1c1c1c] w-full border border-zinc-700 shadow-md rounded-lg">
+    <div className="bg-[#1c1c1c]/80 flex justify-center items-center min-h-screen p-6 px-20">
+      <div className="bg-[#1c1c1c] w-full rounded-lg">
         <div className="p-6 flex items-center justify-between">
-          <div className="flex flex-col gap-4">
+          <div>
             <div className="text-white text-4xl">
-              Hi <span className="text-green-500">{firstName} {lastName}</span>!
+              Hey there,{" "}
+              <span className="underline decoration-pink-500">
+                {firstName} {lastName}
+              </span>
+              ! 👋
             </div>
-            <div className="text-white text-3xl ">
-              Your activity for{" "}
-              <span className="text-zinc-500">
-                {month} {day}, {year}
-              </span> is here!
-            </div>
-            <div className="flex">
-              <div className="text-white bg-zinc-700 p-2 rounded-lg text-sm">
-                <span className="font-medium">Time active: </span>
-                {formattedTime}
+            <div className="flex items-center gap-4 mt-6">
+              <div className="text-zinc-300 text-xl">
+                Your activity for{" "}
+                <span className="underline decoration-indigo-500">
+                  {month} {day}, {year}
+                </span>{" "}
+                is:{" "}
+                <span className="text-white underline decoration-indigo-500">
+                  {formattedTime}
+                </span>
               </div>
+
+              <button className="mt-1">
+                <RefreshCcw size={20} />
+              </button>
             </div>
           </div>
-          <button className="mt-2 flex items-center justify-center py-3 px-2 text-gray-400 hover:text-white transition-colors border border-gray-400 hover:border-white rounded-lg">
-            <span className="mr-1">Refresh</span>
-            <RefreshCcw size={16} />
-          </button>
         </div>
 
         <div>
@@ -104,7 +110,7 @@ const Dashboard = () => {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`
-                    py-4 px-6 text-sm font-medium leading-5 
+                    py-4 px-6 text-lg font-medium leading-5 
                     ${
                       activeTab === tab
                         ? "border-b-2 border-blue-500 text-blue-400"
@@ -121,19 +127,16 @@ const Dashboard = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="border-t border-zinc-700 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="border-t border-zinc-700 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
             <div className="w-full max-w-md p-6 rounded-lg">
-              <h2 className="text-xl text-white mb-4">Top {activeTab} Titles</h2>
+              <h2 className="text-xl text-white mb-4">User behaviour</h2>
               <Titles windowData={getWindowData()} />
             </div>
 
             <div className="w-full max-w-md p-6 rounded-lg">
-              <h2 className="text-xl text-white mb-4">Top Categories</h2>
-              <Titles />
-            </div>
-
-            <div className="w-full max-w-md p-6 rounded-lg">
-              <h2 className="text-xl text-white mb-4">Top Categories</h2>
+              <h2 className="text-xl text-white mb-4">
+                Breakdown in categories
+              </h2>
               <AnimationSunburst />
             </div>
           </div>

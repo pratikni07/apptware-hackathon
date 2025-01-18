@@ -6,16 +6,16 @@ import Components from "./components/Components";
 import GitHubRepo from "./components/code";
 import "./App.css";
 import "animate.css";
-
-import AboutUs from "./components/Aboutus";
 import Dashboard from "./components/Dashboard";
 import LoginPage from "./components/Auth";
+import AdminPort from "./components/AdminPort";
 
 function App() {
   return (
     <div className="bg-black min-h-screen text-white">
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<AdminPort />} />
         <Route path="/dashboard/:userId" element={<Dashboard />} />
         <Route path="/components" element={<Components />} />
         <Route path="/auth" element={<LoginPage />} />

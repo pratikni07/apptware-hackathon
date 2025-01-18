@@ -7,7 +7,7 @@ import { LampDemo } from "../components/elements/Lamp";
 
 const Home = () => {
   return (
-    <div className="bg-slate-950 w-full">
+    <div className="bg-[#1c1c1c] w-full">
       <Navbar />
       <Header />
       <div className="flex flex-col items-center overflow-hidden m-0 p-0">
