@@ -573,10 +573,10 @@ getWindowAnalytics: async (req, res) => {
     console.log(userId, startDate, endDate);
     const activities = await ActivityTracker.find({
       userId,
-      timestamp: {
-        $gte: startDate,
-        $lte: endDate,
-      },
+      // timestamp: {
+      //   $gte: startDate,
+      //   $lte: endDate,
+      // },
     });
 
     // Initialize window tracking object
@@ -645,110 +645,82 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
   // New method to get detailed category analytics
   getCategoryAnalytics: async (req, res) => {
     try {
-      const { category, startDate, endDate } = req.query;
-      const userId = req.user.id;
-
+      const { userId } = req.query;
+  
+      // Get today's date range
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0); // Start of the day
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999); // End of the day
+  
+      // Build the query object
       const query = {
         userId,
-        category,
+        // Uncomment this if you want to include timestamp filtering
+        // timestamp: {
+        //   $gte: startOfDay,
+        //   $lte: endOfDay,
+        // },
       };
-
-      if (startDate && endDate) {
-        query.timestamp = {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate),
-        };
-      }
-
+  
+      // Fetch activities matching the query
       const activities = await ActivityTracker.find(query);
-
-      // Initialize analytics objects
-      const applicationUsage = {};
-      const dailyUsage = {};
-      const productivityMetrics = {
-        totalTime: 0,
-        averageProductivityScore: 0,
-        focusedSessions: 0,
-        distractions: 0,
+  
+      // Initialize usage trackers for each platform
+      const platformUsage = {
+        Linux: [],
+        Windows: [],
+        Mac: [],
       };
-
+  
       // Process activities
       activities.forEach((activity) => {
-        const date = activity.timestamp.toISOString().split("T")[0];
+        const platform = activity.system.platform;
+        const category = activity.category;
         const duration = activity.timeTracking?.duration || 0;
-        const activeWindow = activity.input_activity?.active_window || "Unknown";
-
-        // Track application usage
-        if (activeWindow) {
-          applicationUsage[activeWindow] = applicationUsage[activeWindow] || {
+  
+        // Ensure the platform exists in platformUsage
+        if (!platformUsage[platform]) {
+          return; // Ignore unknown platforms
+        }
+  
+        // Check if the category already exists in the platform array
+        let categoryData = platformUsage[platform].find(
+          (cat) => cat.category === category
+        );
+  
+        if (!categoryData) {
+          categoryData = {
+            category,
             totalTime: 0,
             sessions: 0,
-            averageProductivityScore: 0,
           };
-          applicationUsage[activeWindow].totalTime += duration;
-          applicationUsage[activeWindow].sessions++;
-          applicationUsage[activeWindow].averageProductivityScore +=
-            activity.productivityScore || 0;
+          platformUsage[platform].push(categoryData);
         }
-
-        // Track daily usage
-        dailyUsage[date] = (dailyUsage[date] || 0) + duration;
-
-        // Update productivity metrics
-        productivityMetrics.totalTime += duration;
-        productivityMetrics.averageProductivityScore +=
-          activity.productivityScore || 0;
-        if (activity.focusTime > 25 * 60) {
-          // Sessions over 25 minutes
-          productivityMetrics.focusedSessions++;
-        }
-        productivityMetrics.distractions += activity.distractionCount || 0;
+  
+        // Update category data
+        categoryData.totalTime += duration;
+        categoryData.sessions++;
       });
-
-      // Format the results
-      const formattedApplicationUsage = Object.entries(applicationUsage)
-        .map(([app, metrics]) => ({
-          application: app,
-          totalTime: formatDuration(metrics.totalTime),
-          sessions: metrics.sessions,
-          averageProductivityScore: (
-            metrics.averageProductivityScore / metrics.sessions
-          ).toFixed(2),
-        }))
-        .sort((a, b) => b.totalTime.rawDuration - a.totalTime.rawDuration);
-
-      const formattedDailyUsage = Object.entries(dailyUsage)
-        .map(([date, duration]) => ({
-          date,
-          duration: formatDuration(duration),
-        }))
-        .sort((a, b) => b.duration.rawDuration - a.duration.rawDuration);
-
-      const activityCount = activities.length;
-      productivityMetrics.averageProductivityScore =
-        activityCount > 0
-          ? (
-              productivityMetrics.averageProductivityScore / activityCount
-            ).toFixed(2)
-          : 0;
-
+  
+      // Format the results by converting totalTime to formatted string
+      const formatPlatformData = (platformData) =>
+        platformData.map((data) => ({
+          category: data.category,
+          totalTime: formatDuration(data.totalTime),
+          sessions: data.sessions,
+        }));
+  
       res.status(200).json({
         success: true,
         data: {
-          category,
-          userId,
-          summary: {
-            totalTime: formatDuration(productivityMetrics.totalTime),
-            totalSessions: activityCount,
-            uniqueApplications: Object.keys(applicationUsage).length,
-          },
-          applicationUsage: formattedApplicationUsage,
-          dailyUsage: formattedDailyUsage,
-          productivityMetrics,
-          timeRange: {
-            start: startDate,
-            end: endDate,
-          },
+          Linux: formatPlatformData(platformUsage.Linux),
+          Windows: formatPlatformData(platformUsage.Windows),
+          Mac: formatPlatformData(platformUsage.Mac),
+        },
+        timeRange: {
+          start: startOfDay.toISOString(),
+          end: endOfDay.toISOString(),
         },
       });
     } catch (error) {
@@ -758,7 +730,7 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
       });
     }
   },
-
+  
   // Get activity history with filters
   getActivityHistory: async (req, res) => {
     try {
