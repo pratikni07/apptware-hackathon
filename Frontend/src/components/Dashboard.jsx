@@ -13,7 +13,8 @@ const Dashboard = () => {
         <div className="p-6 flex items-center justify-between">
           <div className="flex flex-col gap-4">
             <div className="text-white text-4xl">
-              Hi <span className="text-green-500">Rohan</span>!
+              Hi <span className="text-green-500">pratiknikat07@gmail.com</span>
+              !
             </div>
             <div className="text-white text-3xl ">
               Your activity for{" "}
