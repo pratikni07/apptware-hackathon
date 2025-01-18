@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+      - track-service
+    environment:
+      - NODE_ENV=development
+
+  auth-service:
+    build:
+      context: ./Auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+
+  track-service:
+    build:
+      context: ./Track-service
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
