@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 3000;
 
 // Enhanced CORS configuration
 // Add this before your routes
+
+app.use(cors());
 app.use((req, res, next) => {
   console.log(`[Request] ${req.method} ${req.url}`);
   console.log("Body:", req.body);
