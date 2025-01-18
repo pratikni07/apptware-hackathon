@@ -4,43 +4,13 @@ const { Schema } = mongoose;
 
 const SystemSchema = new Schema({
   platform: { type: String, required: true },
-  processor: { type: String, required: true },
-  cpu_cores: { type: Number, required: true },
   hostname: { type: String, required: true },
-});
-
-const MouseClickDataSchema = new Schema({
-  x: { type: Number, required: true },
-  y: { type: Number, required: true },
-  button: { type: String, required: true },
 });
 
 const PerformanceSchema = new Schema({
   cpu_percent: { type: Number, required: true },
   memory_percent: { type: Number, required: true },
-  memory_available: { type: Number, required: true },
   disk_percent: { type: Number, required: true },
-  disk_free: { type: Number, required: true },
-});
-
-const NetworkSchema = new Schema({
-  bytes_sent: { type: Number, required: true },
-  bytes_recv: { type: Number, required: true },
-  packets_sent: { type: Number, required: true },
-  packets_recv: { type: Number, required: true },
-});
-
-const RunningAppSchema = new Schema({
-  pid: { type: Number, required: true },
-  name: { type: String, required: true },
-  username: { type: String, required: true },
-  cpu_percent: { type: Number, required: true },
-  memory_percent: { type: Number, required: true },
-});
-
-const ProcessesSchema = new Schema({
-  total: { type: Number, required: true },
-  running_apps: [RunningAppSchema],
 });
 
 const PowerSchema = new Schema({
@@ -51,40 +21,12 @@ const PowerSchema = new Schema({
 
 const InputActivitySchema = new Schema({
   active_window: { type: String, required: false },
-  last_key: { type: String, required: false, default: null },
-  key_counts: { type: Map, of: Number },
-  mouse_clicks: {
-    left: { type: Number, required: true },
-    right: { type: Number, required: true },
-    middle: { type: Number, required: true },
-  },
-  mouse_position: {
-    x: { type: Number, required: true },
-    y: { type: Number, required: true },
-  },
-  last_mouse_click: {
-    timestamp: { type: Date, required: false, default: null },
-    position: {
-      x: { type: Number, required: false },
-      y: { type: Number, required: false },
-    },
-    button: { type: String, required: false },
-  },
 });
 
 const SessionInfoSchema = new Schema({
   idle_time: { type: Number, required: true },
   is_idle: { type: Boolean, required: true },
   session_duration: { type: Number, required: true },
-});
-
-// New schema for time tracking
-const TimeTrackingSchema = new Schema({
-  startTime: { type: Date, required: true },
-  duration: { type: Number, required: true }, // duration in seconds
-  isActive: { type: Boolean, required: true },
-  lastActiveTime: { type: Date },
-  activeWindowDuration: { type: Map, of: Number }, // Store duration per window
 });
 
 const ActivityTrackerSchema = new Schema(
@@ -110,12 +52,9 @@ const ActivityTrackerSchema = new Schema(
     },
     system: { type: SystemSchema, required: true },
     performance: { type: PerformanceSchema, required: true },
-    network: { type: NetworkSchema, required: true },
-    processes: { type: ProcessesSchema, required: true },
     power: { type: PowerSchema, required: true },
     input_activity: { type: InputActivitySchema, required: true },
     session_info: { type: SessionInfoSchema, required: true },
-    timeTracking: { type: TimeTrackingSchema, required: true },
 
     // Additional fields for analytics
     productivityScore: {
@@ -150,7 +89,6 @@ const ActivityTrackerSchema = new Schema(
       { timestamp: 1 },
       { category: 1, timestamp: 1 },
       { userId: 1, timestamp: 1 },
-      { "timeTracking.startTime": 1 },
       { productivityScore: 1 },
     ],
   }
@@ -200,7 +138,7 @@ ActivityTrackerSchema.pre("save", function (next) {
 
 // Add virtual for formatted duration
 ActivityTrackerSchema.virtual("formattedDuration").get(function () {
-  const duration = this.timeTracking.duration;
+  const duration = this.timeTracking?.duration || 0;
   const hours = Math.floor(duration / 3600);
   const minutes = Math.floor((duration % 3600) / 60);
   const seconds = Math.floor(duration % 60);

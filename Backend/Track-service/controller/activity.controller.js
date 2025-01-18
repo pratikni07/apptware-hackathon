@@ -87,8 +87,8 @@ const activityController = {
       const activityData = req.body;
       console.log(activityData);
 
-      // Format the last_mouse_click data if it exists
-      if (activityData.input_activity.last_mouse_click) {
+      // Format the activity data to match the new schema
+      if (activityData.input_activity && activityData.input_activity.last_mouse_click) {
         const mouseClick = activityData.input_activity.last_mouse_click;
         activityData.input_activity.last_mouse_click = {
           timestamp: new Date(),
@@ -103,19 +103,49 @@ const activityController = {
       // Add userId and category
       activityData.userId = userId;
       activityData.category = determineCategory(
-        activityData.input_activity.active_window
+        activityData.input_activity?.active_window || "unknown"
       );
 
-      // Add time tracking data
+      // Add time tracking data to match the new schema
       activityData.timeTracking = {
         startTime: new Date(),
-        duration: activityData.session_info.session_duration,
-        isActive: !activityData.session_info.is_idle,
+        duration: activityData.session_info?.session_duration || 0,
+        isActive: !activityData.session_info?.is_idle,
         lastActiveTime: new Date(),
-        activeWindowDuration: new Map(),
+        activeWindowDuration: {},
       };
 
-      const activity = new ActivityTracker(activityData);
+      // Map new schema structure
+      const formattedActivityData = {
+        timestamp: new Date(),
+        system: {
+          platform: activityData.system?.platform || "unknown",
+          hostname: activityData.system?.hostname || "unknown",
+        },
+        performance: {
+          cpu_percent: activityData.performance?.cpu_percent || 0,
+          memory_percent: activityData.performance?.memory_percent || 0,
+          disk_percent: activityData.performance?.disk_percent || 0,
+        },
+        power: {
+          battery_percent: activityData.power?.battery_percent || 0,
+          power_plugged: activityData.power?.power_plugged || false,
+          battery_time_left: activityData.power?.battery_time_left || 0,
+        },
+        input_activity: {
+          active_window: activityData.input_activity?.active_window || "unknown",
+        },
+        session_info: {
+          idle_time: activityData.session_info?.idle_time || 0,
+          is_idle: activityData.session_info?.is_idle || false,
+          session_duration: activityData.session_info?.session_duration || 0,
+        },
+        timeTracking: activityData.timeTracking,
+        userId: activityData.userId,
+        category: activityData.category,
+      };
+
+      const activity = new ActivityTracker(formattedActivityData);
       await activity.save();
 
       await User.findOneAndUpdate(
@@ -138,6 +168,7 @@ const activityController = {
       });
     }
   },
+
 
   getTimeAnalytics: async (req, res) => {
     try {
