@@ -37,7 +37,21 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("tiktok") ||
     windowLower.includes("threads") ||
     windowLower.includes("telegram") ||
-    windowLower.includes("wechat")
+    windowLower.includes("wechat") ||
+    windowLower.includes("Facebook") ||
+    windowLower.includes("Instagram") ||
+    windowLower.includes("Twitter") ||
+    windowLower.includes("Linkedin") ||
+    windowLower.includes("Discord") ||
+    windowLower.includes("Snapchat") ||
+    windowLower.includes("Reddit") ||
+    windowLower.includes("Pinterest") ||
+    windowLower.includes("Tiktok") ||
+    windowLower.includes("Threads") ||
+    windowLower.includes("Telegram") ||
+    windowLower.includes("Wechat") ||
+    windowLower.includes("whatsapp") ||
+    windowLower.includes("Whatsapp")
   ) {
     return "social_media";
   }
@@ -202,7 +216,9 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("backup") ||
     windowLower.includes("restore") ||
     windowLower.includes("system restore") ||
-    windowLower.includes("drive")
+    windowLower.includes("drive") ||
+    windowLower.includes("Lenovo Vantage") ||
+    windowLower.includes("Task View")
   ) {
     return "utilities";
   }
@@ -569,89 +585,93 @@ const activityController = {
       const endDate = new Date(date);
       endDate.setHours(23, 59, 59, 999);
 
-    console.log(userId, startDate, endDate);
-    const activities = await ActivityTracker.find({
-      userId,
-      // timestamp: {
-      //   $gte: startDate,
-      //   $lte: endDate,
-      // },
-    });
-
-    // Initialize window tracking object
-    const windowUsage = {};
-    let totalTime = 0;
-
-    // Process activities to accumulate time per window
-    activities.forEach((activity) => {
-      const activeWindow = activity.input_activity.active_window;
-      const duration = activity.session_info.session_duration;
-      const system = activity.system.platform;
-      if (activeWindow) {
-        windowUsage[activeWindow] = windowUsage[activeWindow] || {
-          totalDuration: 0,
-          category: activity.category,
-          lastActive: activity.timestamp,
-          system: system,
-        };
-        windowUsage[activeWindow].totalDuration += duration;
-        totalTime += duration;
-      }
-    });
-
-    // Format the window usage data
-    const formattedWindowUsage = Object.entries(windowUsage)
-  .map(([window, data]) => ({
-    window,
-    category: data.category,
-    duration: formatDuration(data.totalDuration),
-    percentage: ((data.totalDuration / totalTime) * 100).toFixed(2),
-    lastActive: data.lastActive,
-    system: data.system, // Include system information
-  }))
-  .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));
-
-// Create separate arrays for Linux, Windows, and MacOS
-const linuxWindows = formattedWindowUsage.filter(item => item.system === 'Linux');
-const windowsWindows = formattedWindowUsage.filter(item => item.system === 'Windows');
-const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS');
-
-
-
-    res.status(200).json({
-      success: true,
-      data: {
-        date,
+      console.log(userId, startDate, endDate);
+      const activities = await ActivityTracker.find({
         userId,
-        windowUsage: formattedWindowUsage,
-        linuxWindows: linuxWindows,
-        windowsWindows: windowsWindows,
-        macOsWindows: macOsWindows,
-        summary: {
-          totalActiveTime: formatDuration(totalTime),
-          totalWindows: formattedWindowUsage.length,
-          mostUsedWindow: formattedWindowUsage[0],
+        // timestamp: {
+        //   $gte: startDate,
+        //   $lte: endDate,
+        // },
+      });
+
+      // Initialize window tracking object
+      const windowUsage = {};
+      let totalTime = 0;
+
+      // Process activities to accumulate time per window
+      activities.forEach((activity) => {
+        const activeWindow = activity.input_activity.active_window;
+        const duration = activity.session_info.session_duration;
+        const system = activity.system.platform;
+        if (activeWindow) {
+          windowUsage[activeWindow] = windowUsage[activeWindow] || {
+            totalDuration: 0,
+            category: activity.category,
+            lastActive: activity.timestamp,
+            system: system,
+          };
+          windowUsage[activeWindow].totalDuration += duration;
+          totalTime += duration;
+        }
+      });
+
+      // Format the window usage data
+      const formattedWindowUsage = Object.entries(windowUsage)
+        .map(([window, data]) => ({
+          window,
+          category: data.category,
+          duration: formatDuration(data.totalDuration),
+          percentage: ((data.totalDuration / totalTime) * 100).toFixed(2),
+          lastActive: data.lastActive,
+          system: data.system, // Include system information
+        }))
+        .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));
+
+      // Create separate arrays for Linux, Windows, and MacOS
+      const linuxWindows = formattedWindowUsage.filter(
+        (item) => item.system === "Linux"
+      );
+      const windowsWindows = formattedWindowUsage.filter(
+        (item) => item.system === "Windows"
+      );
+      const macOsWindows = formattedWindowUsage.filter(
+        (item) => item.system === "MacOS"
+      );
+
+      res.status(200).json({
+        success: true,
+        data: {
+          date,
+          userId,
+          windowUsage: formattedWindowUsage,
+          linuxWindows: linuxWindows,
+          windowsWindows: windowsWindows,
+          macOsWindows: macOsWindows,
+          summary: {
+            totalActiveTime: formatDuration(totalTime),
+            totalWindows: formattedWindowUsage.length,
+            mostUsedWindow: formattedWindowUsage[0],
+          },
         },
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-},
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  },
   // New method to get detailed category analytics
   getCategoryAnalytics: async (req, res) => {
     try {
       const { userId } = req.query;
-  
+
       // Get today's date range
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0); // Start of the day
       const endOfDay = new Date();
       endOfDay.setHours(23, 59, 59, 999); // End of the day
-  
+
       // Build the query object
       const query = {
         userId,
@@ -661,33 +681,33 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
         //   $lte: endOfDay,
         // },
       };
-  
+
       // Fetch activities matching the query
       const activities = await ActivityTracker.find(query);
-  
+
       // Initialize usage trackers for each platform
       const platformUsage = {
         Linux: [],
         Windows: [],
         Mac: [],
       };
-  
+
       // Process activities
       activities.forEach((activity) => {
         const platform = activity.system.platform;
         const category = activity.category;
         const duration = activity.timeTracking?.duration || 0;
-  
+
         // Ensure the platform exists in platformUsage
         if (!platformUsage[platform]) {
           return; // Ignore unknown platforms
         }
-  
+
         // Check if the category already exists in the platform array
         let categoryData = platformUsage[platform].find(
           (cat) => cat.category === category
         );
-  
+
         if (!categoryData) {
           categoryData = {
             category,
@@ -696,12 +716,12 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
           };
           platformUsage[platform].push(categoryData);
         }
-  
+
         // Update category data
         categoryData.totalTime += duration;
         categoryData.sessions++;
       });
-  
+
       // Format the results by converting totalTime to formatted string
       const formatPlatformData = (platformData) =>
         platformData.map((data) => ({
@@ -709,7 +729,7 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
           totalTime: formatDuration(data.totalTime),
           sessions: data.sessions,
         }));
-  
+
       res.status(200).json({
         success: true,
         data: {
@@ -729,7 +749,7 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
       });
     }
   },
-  
+
   // Get activity history with filters
   getActivityHistory: async (req, res) => {
     try {
