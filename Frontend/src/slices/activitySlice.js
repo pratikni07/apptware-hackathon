@@ -354,6 +354,7 @@ const activitySlice = createSlice({
       state.windowsMatrix = action.payload.data.platformMetrics.Windows;
       state.linuxMatrix = action.payload.data.platformMetrics.Linux;
       state.macMatrix = action.payload.data.platformMetrics.Mac;
+
     });
 
     builder.addCase(fetchUserData.rejected, (state, action) => {
@@ -372,6 +373,8 @@ const activitySlice = createSlice({
       state.windowsCategory = action.payload.data.Windows;
       state.linuxCategory = action.payload.data.Linux;
       state.macCategory = action.payload.data.Mac;
+
+      console.log('mac category',action.payload.data.Mac)
     });
 
     builder.addCase(fetchCategoryData.rejected, (state, action) => {

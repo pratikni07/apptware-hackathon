@@ -69,11 +69,18 @@ const Dashboard = () => {
   const linuxMatrix = useSelector((state) => state.activity.linuxMatrix);
   const macMatrix = useSelector((state) => state.activity.macMatrix);
 
+console.log('mac cat',macCategory)
 
- 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleClick(new Event("click"));
+    }, 20000);
+
+    return () => clearInterval(interval); 
+  }, []);
 
 
-  console.log("we we windows", windowsWindows);
+  // console.log("we we windows", windowsWindows);
 
   useEffect(() => {
     const data = {
@@ -169,7 +176,7 @@ const Dashboard = () => {
               <span className="underline decoration-pink-500">
                 {firstName} {lastName}
               </span>
-              !
+              ,
             </div>
 
             <div className="flex items-center gap-4 mt-6">

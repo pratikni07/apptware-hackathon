@@ -10,6 +10,7 @@ const AdminPort = () => {
 
   const user = localStorage.getItem("user");
   const companyId = JSON.parse(user).companyId;
+  const companyName = JSON.parse(user).companyName;
 
   const fetchUsers = async () => {
     try {
@@ -39,10 +40,10 @@ const AdminPort = () => {
       <div className="w-full max-w-4xl bg-zinc-900 rounded-lg p-6 m-6">
         <div className="mb-6">
           <h2 className="text-white text-2xl font-semibold">
-            Company XYZ - Employee Activity Dashboard
+            Company {companyName} - Employee Activity Dashboard
           </h2>
           <p className="text-zinc-400 text-sm">
-            Welcome to the Employee Activity Dashboard for Company XYZ. Here,
+            Welcome to the Employee Activity Dashboard for Company {companyName}. Here,
             you can monitor the activities of each employee by selecting "View
             Activity" and tracking their performance for better workflow
             management.
