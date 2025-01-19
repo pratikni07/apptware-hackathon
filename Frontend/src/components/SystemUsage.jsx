@@ -2,6 +2,13 @@ import React, { useState } from "react";
 import { RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
 import { X } from "lucide-react";
 
+const generatePastelColor = (baseHue) => {
+  // Generate pastel colors that maintain readability with white text
+  const saturation = Math.floor(Math.random() * (85 - 65) + 65); // 65-85%
+  const lightness = Math.floor(Math.random() * (65 - 55) + 55); // 55-65%
+  return `hsl(${baseHue}, ${saturation}%, ${lightness}%)`;
+};
+
 const SystemUsage = ({ metricData, activeOS }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -10,17 +17,17 @@ const SystemUsage = ({ metricData, activeOS }) => {
     {
       name: "CPU",
       value: metricData.cpu || 0,
-      fill: "#22c55e", // Green
+      fill: generatePastelColor(120), // Green base hue
     },
     {
       name: "Memory",
       value: metricData.memory || 0,
-      fill: "#3b82f6", // Blue
+      fill: generatePastelColor(210), // Blue base hue
     },
     {
       name: "Disk",
       value: metricData.disk || 0,
-      fill: "#f59e0b", // Amber
+      fill: generatePastelColor(45), // Amber base hue
     },
   ];
 

@@ -9,6 +9,7 @@ import "animate.css";
 import Dashboard from "./components/Dashboard";
 import LoginPage from "./components/Auth";
 import AdminPort from "./components/AdminPort";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/code" element={<GitHubRepo />} />
         <Route path="/code/:componentName" element={<GitHubRepo />} />
       </Routes>
+      <Toaster />
     </div>
   );
 }
