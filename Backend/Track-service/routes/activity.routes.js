@@ -6,7 +6,7 @@ const activityController = require("../controller/activity.controller");
 const authMiddleware = require("../middlewares/authMiddleware");
 const UserActivityController = require("../controller/userActivity");
 // Protect all routes
-// router.use(authMiddleware);
+router.use(authMiddleware);
 
 // Record new activity
 router.post("/record", activityController.recordActivity);

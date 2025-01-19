@@ -262,6 +262,7 @@ const activityController = {
 
       // Ensure required fields have fallback defaults
 
+
       const formattedActivityData = {
         timestamp: new Date(),
         system: {
