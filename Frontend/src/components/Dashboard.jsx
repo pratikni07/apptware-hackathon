@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import CategoryTitles from "./CategoryTitles";
 import SystemUsage from "./SystemUsage";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const tabs = ["Windows", "MacOS", "Linux"];
@@ -112,7 +113,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    toast("Loading..");
   }
 
   if (error) {
