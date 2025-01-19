@@ -573,10 +573,10 @@ const activityController = {
     console.log(userId, startDate, endDate);
     const activities = await ActivityTracker.find({
       userId,
-      // timestamp: {
-      //   $gte: startDate,
-      //   $lte: endDate,
-      // },
+      timestamp: {
+        $gte: startDate,
+        $lte: endDate,
+      },
     });
 
     // Initialize window tracking object
@@ -657,10 +657,10 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
       const query = {
         userId,
         // Uncomment this if you want to include timestamp filtering
-        // timestamp: {
-        //   $gte: startOfDay,
-        //   $lte: endOfDay,
-        // },
+        timestamp: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        },
       };
   
       // Fetch activities matching the query
@@ -677,7 +677,7 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
       activities.forEach((activity) => {
         const platform = activity.system.platform;
         const category = activity.category;
-        const duration = activity.timeTracking?.duration || 0;
+        const duration = activity.session_info?.session_duration || 0;
   
         // Ensure the platform exists in platformUsage
         if (!platformUsage[platform]) {
