@@ -263,7 +263,7 @@ const activityController = {
       // Ensure required fields have fallback defaults
 
       const formattedActivityData = {
-        timestamp: activityData.timestamp,
+        timestamp: new Date(),
         system: {
           platform: activityData.system?.platform || "Unknown",
           hostname: activityData.system?.hostname || "Unknown",
