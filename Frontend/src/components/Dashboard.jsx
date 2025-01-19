@@ -128,21 +128,26 @@ const Dashboard = () => {
   const lastName =
     user?.lastName.charAt(0).toUpperCase() + user?.lastName.slice(1);
 
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const isOwnProfile =
+    storedUser.firstname === firstName && storedUser.lastname === lastName;
+
   return (
     <div className="bg-[#1c1c1c]/80 flex justify-center items-center min-h-screen p-6 px-20">
       <div className="bg-[#1c1c1c] w-full rounded-lg">
         <div className="p-6 flex items-center justify-between">
           <div>
             <div className="text-white text-4xl">
-              Hey there,{" "}
+              {isOwnProfile ? <>Hey there, </> : <>This is </>}
               <span className="underline decoration-pink-500">
                 {firstName} {lastName}
               </span>
-              ! 👋
+              !
             </div>
+
             <div className="flex items-center gap-4 mt-6">
               <div className="text-zinc-300 text-xl">
-                Your activity for{" "}
+                {isOwnProfile ? "Your" : "Their"} activity for{" "}
                 <span className="underline decoration-indigo-500">
                   {month} {day}, {year}
                 </span>{" "}
