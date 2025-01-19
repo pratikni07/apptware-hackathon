@@ -1,5 +1,19 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { 
+  Play,
+  Share2,
+  Code,
+  Briefcase,
+  Globe,
+  Gamepad2,
+  GraduationCap,
+  Wallet,
+  Heart,
+  Settings,
+  MessageSquare,
+  HelpCircle
+} from "lucide-react";
 
 const getTimeInSeconds = (timeStr) => {
   const parts = timeStr.split(" ");
@@ -24,9 +38,31 @@ const generatePastelColor = () => {
   return `hsl(${hue}, 70%, 80%)`;
 };
 
+function getCategoryIcon(category) {
+  const icons = {
+    entertainment: <Play className="w-5 h-5" />,
+    social_media: <Share2 className="w-5 h-5" />,
+    coding: <Code className="w-5 h-5" />,
+    productivity: <Briefcase className="w-5 h-5" />,
+    browser: <Globe className="w-5 h-5" />,
+    gaming: <Gamepad2 className="w-5 h-5" />,
+    education: <GraduationCap className="w-5 h-5" />,
+    finance: <Wallet className="w-5 h-5" />,
+    health: <Heart className="w-5 h-5" />,
+    utilities: <Settings className="w-5 h-5" />,
+    communication: <MessageSquare className="w-5 h-5" />,
+    other: <HelpCircle className="w-5 h-5" />
+  };
+
+  return icons[category] || icons["other"];
+}
+
 const Titles = ({ windowData = [] }) => {
+  
   const [showAll, setShowAll] = useState(false);
   const displayedApps = showAll ? windowData : windowData?.slice(0, 5);
+
+  console.log("dispalyed", displayedApps);
 
   if (!windowData || windowData.length === 0) {
     return (
@@ -43,6 +79,15 @@ const Titles = ({ windowData = [] }) => {
           const progressWidth = getWidthPercentage(app?.duration?.formatted);
           return (
             <div key={index} className="relative rounded-lg overflow-hidden">
+
+              {/* <div className="flex items-center bg-white">
+                <img
+                  src={getCategoryIcon(app?.category)}
+                  alt={app?.category}
+                  className="w-2 h-2 mr-2"
+                />
+                <span className="text-xs text-gray-400">{app?.category}</span>
+              </div> */}
               <div
                 className="absolute top-0 left-0 h-full rounded-lg"
                 style={{
@@ -51,6 +96,14 @@ const Titles = ({ windowData = [] }) => {
                 }}
               />
               <div className="relative p-2 flex justify-between items-center text-white">
+              {/* <img
+                  src={getCategoryIcon(app?.category)}
+                  alt={app?.category}
+                  className="w-6 h-6 mr-2"
+                /> */}
+                <span className="mr-3 flex-shrink-0 text-white ">
+                    {getCategoryIcon(app?.category)}
+                  </span>
                 <span className="text-sm truncate whitespace-nowrap overflow-hidden flex-1 pr-4">
                   {app?.window}
                 </span>
