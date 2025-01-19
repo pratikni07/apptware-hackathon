@@ -15,6 +15,25 @@ const Dashboard = () => {
   const tabs = ["Windows", "MacOS", "Linux"];
   const [activeTab, setActiveTab] = useState("Windows");
 
+  const windowsActive= useSelector((state) => state.activity.windowsActiveHours);
+  const linuxActive = useSelector((state) => state.activity.linuxActiveHours);
+  const macActive = useSelector((state) => state.activity.macActiveHours);
+
+  useEffect(() => {
+    if(activeTab=="MacOS"){
+      // formattedTime= `${macActive.hours} hr ${macActive.minutes} min ${macActive.seconds} sec`
+      setFormattedTime(`${macActive.hours} hr ${macActive.minutes} min ${macActive.seconds} sec`)
+    }else if( activeTab=="Linux"){
+      // formattedTime= `${linuxActive.hours} hr ${linuxActive.minutes} min ${linuxActive.seconds} sec`
+      setFormattedTime(`${linuxActive.hours} hr ${linuxActive.minutes} min ${linuxActive.seconds} sec`)
+
+    }else{
+      // formattedTime= `${windowsActive.hours} hr ${windowsActive.minutes} min ${windowsActive.seconds} sec`
+      setFormattedTime(`${windowsActive.hours} hr ${windowsActive.minutes} min ${windowsActive.seconds} sec`)
+    }
+
+     
+  }, [activeTab,windowsActive,linuxActive,macActive]);
   const { userId } = useParams();
 
   const loading = useSelector((state) => state.activity.loading);
@@ -34,7 +53,8 @@ const Dashboard = () => {
   const roundedMinutes = Math.floor(minutes);
   const seconds = Math.round((minutes - roundedMinutes) * 60);
 
-  const formattedTime = `${hours} hr ${roundedMinutes} min ${seconds} sec`;
+  const [formattedTime,setFormattedTime]=useState(`${windowsActive.hours} hr ${windowsActive.minutes} min ${windowsActive.seconds} sec`);
+
 
   const linuxWindows = useSelector((state) => state.activity.linuxWindows);
   const macWindows = useSelector((state) => state.activity.macWindows);
@@ -47,6 +67,12 @@ const Dashboard = () => {
   const windowsMatrix = useSelector((state) => state.activity.windowsMatrix);
   const linuxMatrix = useSelector((state) => state.activity.linuxMatrix);
   const macMatrix = useSelector((state) => state.activity.macMatrix);
+
+
+ 
+
+
+  console.log("we we windows", windowsWindows);
 
   useEffect(() => {
     const data = {

@@ -27,6 +27,21 @@ const initialState = {
   windowsMatrix:[],
   linuxMatrix:[],
   macMatrix:[],
+  windowsActiveHours:{
+    hours:0,
+    minutes:0,
+    seconds:0
+  },
+  linuxActiveHours:{
+    hours:0,
+    minutes:0,
+    seconds:0
+  },
+  macActiveHours:{
+    hours:0,
+    minutes:0,
+    seconds:0
+  },
 };
 
 
@@ -106,6 +121,22 @@ export const fetchStats = createAsyncThunk(
     return resp.data;
   }
 );
+
+const accumulateTime = (acc, curr) => {
+  acc.hours += curr.duration.hours;
+  acc.minutes += curr.duration.minutes;
+  acc.seconds += curr.duration.seconds;
+  return acc;
+};
+
+// Helper function to normalize time values
+const normalizeTime = ({ hours, minutes, seconds }) => {
+  minutes += Math.floor(seconds / 60);
+  seconds %= 60;
+  hours += Math.floor(minutes / 60);
+  minutes %= 60;
+  return { hours, minutes, seconds };
+};
 
 export const fetchTimeAnalysis = createAsyncThunk(
   "activity/fetchTimeAnalysis",
@@ -274,6 +305,19 @@ const activitySlice = createSlice({
       state.linuxWindows=action.payload?.data?.linuxWindows
       state.macWindows=action.payload?.data?.macOsWindows
       state.windowsWindows=action.payload?.data?.windowsWindows
+      console.log('windows',state.windows)
+      state.windowsActiveHours = normalizeTime(
+        state.windows.reduce(accumulateTime, { hours: 0, minutes: 0, seconds: 0 })
+      );
+      
+      state.linuxActiveHours = normalizeTime(
+        state.linuxWindows.reduce(accumulateTime, { hours: 0, minutes: 0, seconds: 0 })
+      );
+      
+      state.macActiveHours = normalizeTime(
+        state.macWindows.reduce(accumulateTime, { hours: 0, minutes: 0, seconds: 0 })
+      );
+
     });
 
     builder.addCase(fetchWindow.rejected, (state, action) => {
