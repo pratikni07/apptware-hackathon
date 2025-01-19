@@ -2,9 +2,14 @@ import React, { useState, useEffect } from "react";
 import Titles from "./Titles";
 import AnimationSunburst from "./AnimationSunburst";
 import { RefreshCcw } from "lucide-react";
-import { fetchUserData, fetchWindow , fetchCategoryData} from "./../slices/activitySlice";
+import {
+  fetchUserData,
+  fetchWindow,
+  fetchCategoryData,
+} from "./../slices/activitySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import CategoryTitles from "./CategoryTitles";
 
 const Dashboard = () => {
   const tabs = ["Windows", "MacOS", "Linux"];
@@ -35,14 +40,12 @@ const Dashboard = () => {
   const macWindows = useSelector((state) => state.activity.macWindows);
   const windowsWindows = useSelector((state) => state.activity.windowsWindows);
 
-
   const winCategory = useSelector((state) => state.activity.windowsCategory);
   const linuxCategory = useSelector((state) => state.activity.linuxCategory);
   const macCategory = useSelector((state) => state.activity.macCategory);
 
-  console.log('categories in dash')
-  console.log(winCategory, linuxCategory, macCategory);
-
+  // console.log();
+  console.log("categories in dash", winCategory, linuxCategory, macCategory);
 
   useEffect(() => {
     const data = {
@@ -57,9 +60,8 @@ const Dashboard = () => {
     }
   }, [dispatch]);
 
-
-  const handleClick=(e)=>{
-    e.preventDefault()
+  const handleClick = (e) => {
+    e.preventDefault();
     const data = {
       userId: userId,
       date: date,
@@ -67,9 +69,22 @@ const Dashboard = () => {
     dispatch(fetchUserData(userId));
     dispatch(fetchWindow(data));
     dispatch(fetchCategoryData(userId));
-  }
+  };
 
   // Function to get the appropriate window data based on active tab
+  const getCategoryData = () => {
+    switch (activeTab) {
+      case "Linux":
+        return linuxCategory;
+      case "MacOS":
+        return macCategory;
+      case "Windows":
+        return winCategory;
+      default:
+        return winCategory;
+    }
+  };
+
   const getWindowData = () => {
     switch (activeTab) {
       case "Linux":
@@ -88,9 +103,11 @@ const Dashboard = () => {
   }
 
   if (error) {
-    return <div
-      className="text-red-500 flex items-center justify-center min-h-screen"    
-    >Error: {error}</div>;
+    return (
+      <div className="text-red-500 flex items-center justify-center min-h-screen">
+        Error: {error}
+      </div>
+    );
   }
 
   const firstName =
@@ -165,7 +182,7 @@ const Dashboard = () => {
               <h2 className="text-xl text-white mb-4">
                 Breakdown in categories
               </h2>
-              <Titles windowData={getWindowData()} />
+              <CategoryTitles windowData={getCategoryData()} />
               {/* <AnimationSunburst /> */}
             </div>
           </div>
