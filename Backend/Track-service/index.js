@@ -26,6 +26,9 @@ app.use(cors());
 
 app.use("/activity", activityRoutes);
 
+const { setupDailyReports } = require("./services/activityReportService");
+setupDailyReports();
+
 app.get("/", (req, res) => {
   res.status(200).json({
     message: "Welcome to the API",

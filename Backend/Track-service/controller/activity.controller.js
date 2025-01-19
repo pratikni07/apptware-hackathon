@@ -19,7 +19,19 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("media player") ||
     windowLower.includes("hbo") ||
     windowLower.includes("mx player") ||
-    windowLower.includes("plex")
+    windowLower.includes("plex") ||
+    windowLower.includes("Netflix") ||
+    windowLower.includes("Youtube") ||
+    windowLower.includes("Prime") ||
+    windowLower.includes("Hotstar") ||
+    windowLower.includes("Hulu") ||
+    windowLower.includes("Disney+") ||
+    windowLower.includes("Spotify") ||
+    windowLower.includes("Vlc") ||
+    windowLower.includes("Media Player") ||
+    windowLower.includes("Hbo") ||
+    windowLower.includes("Mx Player") ||
+    windowLower.includes("Plex")
   ) {
     return "entertainment";
   }
@@ -37,13 +49,28 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("tiktok") ||
     windowLower.includes("threads") ||
     windowLower.includes("telegram") ||
-    windowLower.includes("wechat")
+    windowLower.includes("wechat") ||
+    windowLower.includes("Facebook") ||
+    windowLower.includes("Instagram") ||
+    windowLower.includes("Twitter") ||
+    windowLower.includes("Linkedin") ||
+    windowLower.includes("Discord") ||
+    windowLower.includes("Snapchat") ||
+    windowLower.includes("Reddit") ||
+    windowLower.includes("Pinterest") ||
+    windowLower.includes("Tiktok") ||
+    windowLower.includes("Threads") ||
+    windowLower.includes("Telegram") ||
+    windowLower.includes("Wechat") ||
+    windowLower.includes("whatsapp") ||
+    windowLower.includes("Whatsapp")
   ) {
     return "social_media";
   }
 
   // Development/work
   if (
+    windowLower.includes("flutter_activity") ||
     windowLower.includes("code") ||
     windowLower.includes("studio") ||
     windowLower.includes("intellij") ||
@@ -57,9 +84,20 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("xcode") ||
     windowLower.includes("postman") ||
     windowLower.includes("android studio") ||
-    windowLower.includes("flutter_activity") ||
     windowLower.includes("kubernetes") ||
-    windowLower.includes("docker")
+    windowLower.includes("docker") ||
+    windowLower.includes("Visual Studio Code") ||
+    windowLower.includes("Visual Studio") ||
+    windowLower.includes("Android Studio") ||
+    windowLower.includes("IntelliJ") ||
+    windowLower.includes("Sublime") ||
+    windowLower.includes("Terminal") ||
+    windowLower.includes("Git") ||
+    windowLower.includes("GitHub") ||
+    windowLower.includes("Postman") ||
+    windowLower.includes("PyCharm") ||
+    windowLower.includes("Eclipse") ||
+    windowLower.includes("Xcode")
   ) {
     return "coding";
   }
@@ -85,11 +123,17 @@ const determineCategory = (activeWindow) => {
   // Browsers
   if (
     windowLower.includes("chrome") ||
+    windowLower.includes("Google") ||
     windowLower.includes("firefox") ||
+    windowLower.includes("Firefox") ||
     windowLower.includes("safari") ||
+    windowLower.includes("Safari") ||
     windowLower.includes("edge") ||
+    windowLower.includes("Edge") ||
     windowLower.includes("opera") ||
+    windowLower.includes("Opera") ||
     windowLower.includes("brave") ||
+    windowLower.includes("Brave") ||
     windowLower.includes("duckduckgo")
   ) {
     return "browser";
@@ -107,7 +151,18 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("unreal") ||
     windowLower.includes("blizzard") ||
     windowLower.includes("minecraft") ||
-    windowLower.includes("fortnite")
+    windowLower.includes("fortnite") ||
+    windowLower.includes("Steam") ||
+    windowLower.includes("Game") ||
+    windowLower.includes("Valorant") ||
+    windowLower.includes("Epic Games") ||
+    windowLower.includes("Xbox") ||
+    windowLower.includes("Playstation") ||
+    windowLower.includes("Unity") ||
+    windowLower.includes("Unreal") ||
+    windowLower.includes("Blizzard") ||
+    windowLower.includes("Minecraft") ||
+    windowLower.includes("Fortnite")
   ) {
     return "gaming";
   }
@@ -202,7 +257,12 @@ const determineCategory = (activeWindow) => {
     windowLower.includes("backup") ||
     windowLower.includes("restore") ||
     windowLower.includes("system restore") ||
-    windowLower.includes("drive")
+    windowLower.includes("drive") ||
+    windowLower.includes("Lenovo Vantage") ||
+    windowLower.includes("Task View") ||
+    windowLower.includes("Windows Security") ||
+    windowLower.includes("Task Switching") ||
+    windowLower.includes("Task")
   ) {
     return "utilities";
   }
@@ -261,7 +321,6 @@ const activityController = {
       };
 
       // Ensure required fields have fallback defaults
-
 
       const formattedActivityData = {
         timestamp: new Date(),
@@ -570,89 +629,93 @@ const activityController = {
       const endDate = new Date(date);
       endDate.setHours(23, 59, 59, 999);
 
-    console.log(userId, startDate, endDate);
-    const activities = await ActivityTracker.find({
-      userId,
-      timestamp: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    });
-
-    // Initialize window tracking object
-    const windowUsage = {};
-    let totalTime = 0;
-
-    // Process activities to accumulate time per window
-    activities.forEach((activity) => {
-      const activeWindow = activity.input_activity.active_window;
-      const duration = activity.session_info.session_duration;
-      const system = activity.system.platform;
-      if (activeWindow) {
-        windowUsage[activeWindow] = windowUsage[activeWindow] || {
-          totalDuration: 0,
-          category: activity.category,
-          lastActive: activity.timestamp,
-          system: system,
-        };
-        windowUsage[activeWindow].totalDuration += duration;
-        totalTime += duration;
-      }
-    });
-
-    // Format the window usage data
-    const formattedWindowUsage = Object.entries(windowUsage)
-  .map(([window, data]) => ({
-    window,
-    category: data.category,
-    duration: formatDuration(data.totalDuration),
-    percentage: ((data.totalDuration / totalTime) * 100).toFixed(2),
-    lastActive: data.lastActive,
-    system: data.system, // Include system information
-  }))
-  .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));
-
-// Create separate arrays for Linux, Windows, and MacOS
-const linuxWindows = formattedWindowUsage.filter(item => item.system === 'Linux');
-const windowsWindows = formattedWindowUsage.filter(item => item.system === 'Windows');
-const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS');
-
-
-
-    res.status(200).json({
-      success: true,
-      data: {
-        date,
+      console.log(userId, startDate, endDate);
+      const activities = await ActivityTracker.find({
         userId,
-        windowUsage: formattedWindowUsage,
-        linuxWindows: linuxWindows,
-        windowsWindows: windowsWindows,
-        macOsWindows: macOsWindows,
-        summary: {
-          totalActiveTime: formatDuration(totalTime),
-          totalWindows: formattedWindowUsage.length,
-          mostUsedWindow: formattedWindowUsage[0],
+        timestamp: {
+          $gte: startDate,
+          $lte: endDate,
         },
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-},
+      });
+
+      // Initialize window tracking object
+      const windowUsage = {};
+      let totalTime = 0;
+
+      // Process activities to accumulate time per window
+      activities.forEach((activity) => {
+        const activeWindow = activity.input_activity.active_window;
+        const duration = activity.session_info.session_duration;
+        const system = activity.system.platform;
+        if (activeWindow) {
+          windowUsage[activeWindow] = windowUsage[activeWindow] || {
+            totalDuration: 0,
+            category: activity.category,
+            lastActive: activity.timestamp,
+            system: system,
+          };
+          windowUsage[activeWindow].totalDuration += duration;
+          totalTime += duration;
+        }
+      });
+
+      // Format the window usage data
+      const formattedWindowUsage = Object.entries(windowUsage)
+        .map(([window, data]) => ({
+          window,
+          category: data.category,
+          duration: formatDuration(data.totalDuration),
+          percentage: ((data.totalDuration / totalTime) * 100).toFixed(2),
+          lastActive: data.lastActive,
+          system: data.system, // Include system information
+        }))
+        .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage));
+
+      // Create separate arrays for Linux, Windows, and MacOS
+      const linuxWindows = formattedWindowUsage.filter(
+        (item) => item.system === "Linux"
+      );
+      const windowsWindows = formattedWindowUsage.filter(
+        (item) => item.system === "Windows"
+      );
+      const macOsWindows = formattedWindowUsage.filter(
+        (item) => item.system === "MacOS"
+      );
+
+      res.status(200).json({
+        success: true,
+        data: {
+          date,
+          userId,
+          windowUsage: formattedWindowUsage,
+          linuxWindows: linuxWindows,
+          windowsWindows: windowsWindows,
+          macOsWindows: macOsWindows,
+          summary: {
+            totalActiveTime: formatDuration(totalTime),
+            totalWindows: formattedWindowUsage.length,
+            mostUsedWindow: formattedWindowUsage[0],
+          },
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  },
   // New method to get detailed category analytics
   getCategoryAnalytics: async (req, res) => {
     try {
       const { userId } = req.query;
-  
+
       // Get today's date range
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0); // Start of the day
       const endOfDay = new Date();
       endOfDay.setHours(23, 59, 59, 999); // End of the day
-  
+
       // Build the query object
       const query = {
         userId,
@@ -662,33 +725,33 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
           $lte: endOfDay,
         },
       };
-  
+
       // Fetch activities matching the query
       const activities = await ActivityTracker.find(query);
-  
+
       // Initialize usage trackers for each platform
       const platformUsage = {
         Linux: [],
         Windows: [],
         Mac: [],
       };
-  
+
       // Process activities
       activities.forEach((activity) => {
         const platform = activity.system.platform;
         const category = activity.category;
         const duration = activity.session_info?.session_duration || 0;
-  
+
         // Ensure the platform exists in platformUsage
         if (!platformUsage[platform]) {
           return; // Ignore unknown platforms
         }
-  
+
         // Check if the category already exists in the platform array
         let categoryData = platformUsage[platform].find(
           (cat) => cat.category === category
         );
-  
+
         if (!categoryData) {
           categoryData = {
             category,
@@ -697,12 +760,12 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
           };
           platformUsage[platform].push(categoryData);
         }
-  
+
         // Update category data
         categoryData.totalTime += duration;
         categoryData.sessions++;
       });
-  
+
       // Format the results by converting totalTime to formatted string
       const formatPlatformData = (platformData) =>
         platformData.map((data) => ({
@@ -710,7 +773,7 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
           totalTime: formatDuration(data.totalTime),
           sessions: data.sessions,
         }));
-  
+
       res.status(200).json({
         success: true,
         data: {
@@ -730,7 +793,7 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
       });
     }
   },
-  
+
   // Get activity history with filters
   getActivityHistory: async (req, res) => {
     try {
@@ -745,7 +808,6 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
         };
       }
 
-      
       const skip = (page - 1) * limit;
 
       const activities = await ActivityTracker.find(query)
