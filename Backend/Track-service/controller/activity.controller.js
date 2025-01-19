@@ -734,7 +734,7 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
   // Get activity history with filters
   getActivityHistory: async (req, res) => {
     try {
-      const { startDate, endDate, category, limit = 50, page = 1 } = req.query;
+      const { startDate, endDate, limit = 50, page = 1 } = req.query;
 
       const query = {};
 
@@ -745,11 +745,7 @@ const macOsWindows = formattedWindowUsage.filter(item => item.system === 'MacOS'
         };
       }
 
-      if (category) {
-        query.category = category;
-      }
-
-      console.log(query);
+      
       const skip = (page - 1) * limit;
 
       const activities = await ActivityTracker.find(query)
