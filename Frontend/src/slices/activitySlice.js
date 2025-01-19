@@ -24,6 +24,9 @@ const initialState = {
   windowsCategory:[],
   linuxCategory:[],
   macCategory:[],
+  windowsMatrix:[],
+  linuxMatrix:[],
+  macMatrix:[],
 };
 
 
@@ -304,9 +307,9 @@ const activitySlice = createSlice({
       state.user = action.payload.data.user;
       state.activeHours = action.payload.data.activeHours;
       state.minutes = action.payload.data.minutes;
-      state.cpu = action.payload.data.cpu;
-      state.memory = action.payload.data.memory;
-      state.disk = action.payload.data.disk;
+      state.windowsMatrix = action.payload.data.platformMetrics.Windows;
+      state.linuxMatrix = action.payload.data.platformMetrics.Linux;
+      state.macMatrix = action.payload.data.platformMetrics.Mac;
     });
 
     builder.addCase(fetchUserData.rejected, (state, action) => {

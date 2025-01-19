@@ -44,6 +44,14 @@ const Dashboard = () => {
   console.log(winCategory, linuxCategory, macCategory);
 
 
+
+   const windowsMatrix = useSelector((state) => state.activity.windowsMatrix);
+    const linuxMatrix = useSelector((state) => state.activity.linuxMatrix);
+    const macMatrix = useSelector((state) => state.activity.macMatrix);
+
+    console.log('matrix in dash')
+    console.log(windowsMatrix, linuxMatrix, macMatrix);
+
   useEffect(() => {
     const data = {
       userId: userId,
