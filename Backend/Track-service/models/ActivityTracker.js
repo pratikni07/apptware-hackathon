@@ -40,14 +40,14 @@ const ActivityTrackerSchema = new Schema(
     category: {
       type: String,
       required: true,
-      enum: [
-        "entertainment",
-        "social_media",
-        "coding",
-        "productivity",
-        "gaming",
-        "other",
-      ],
+      // enum: [
+      //   "entertainment",
+      //   "social_media",
+      //   "coding",
+      //   "productivity",
+      //   "gaming",
+      //   "other",
+      // ],
       index: true,
     },
     system: { type: SystemSchema, required: true },

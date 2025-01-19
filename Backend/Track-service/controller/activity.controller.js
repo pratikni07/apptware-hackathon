@@ -733,7 +733,7 @@ const activityController = {
       const platformUsage = {
         Linux: [],
         Windows: [],
-        Mac: [],
+        MacOS: [],
       };
 
       // Process activities
@@ -743,9 +743,9 @@ const activityController = {
         const duration = activity.session_info?.session_duration || 0;
 
         // Ensure the platform exists in platformUsage
-        if (!platformUsage[platform]) {
-          return; // Ignore unknown platforms
-        }
+        // if (!platformUsage[platform]) {
+        //   return; // Ignore unknown platforms
+        // }
 
         // Check if the category already exists in the platform array
         let categoryData = platformUsage[platform].find(
@@ -774,12 +774,14 @@ const activityController = {
           sessions: data.sessions,
         }));
 
+        console.log('mac', platformUsage.MacOS);
+
       res.status(200).json({
         success: true,
         data: {
           Linux: formatPlatformData(platformUsage.Linux),
           Windows: formatPlatformData(platformUsage.Windows),
-          Mac: formatPlatformData(platformUsage.Mac),
+          Mac: formatPlatformData(platformUsage.MacOS),
         },
         timeRange: {
           start: startOfDay.toISOString(),
