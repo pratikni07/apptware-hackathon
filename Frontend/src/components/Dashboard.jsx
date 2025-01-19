@@ -30,7 +30,7 @@ const Dashboard = () => {
 
     }else{
       // formattedTime= `${windowsActive.hours} hr ${windowsActive.minutes} min ${windowsActive.seconds} sec`
-      setFormattedTime(`${windowsActive.hours} hr ${windowsActive.minutes} min ${windowsActive.seconds} sec`)
+      setFormattedTime(`${windowsActive.hours/2} hr ${windowsActive.minutes} min ${windowsActive.seconds} sec`)
     }
 
      
@@ -54,7 +54,7 @@ const Dashboard = () => {
   const roundedMinutes = Math.floor(minutes);
   const seconds = Math.round((minutes - roundedMinutes) * 60);
 
-  const [formattedTime,setFormattedTime]=useState(`${windowsActive.hours} hr ${windowsActive.minutes} min ${windowsActive.seconds} sec`);
+  const [formattedTime,setFormattedTime]=useState(`${windowsActive.hours/2} hr ${windowsActive.minutes} min ${windowsActive.seconds} sec`);
 
 
   const linuxWindows = useSelector((state) => state.activity.linuxWindows);
