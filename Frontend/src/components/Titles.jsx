@@ -33,9 +33,12 @@ const getWidthPercentage = (timeStr) => {
 };
 
 const generatePastelColor = () => {
-  // Generate pastel colors by using high lightness values
+  // Generate pastel colors that maintain readability with white text
   const hue = Math.floor(Math.random() * 360);
-  return `hsl(${hue}, 70%, 80%)`;
+  const saturation = Math.floor(Math.random() * (85 - 65) + 65); // 65-85%
+  const lightness = Math.floor(Math.random() * (65 - 55) + 55); // 55-65%
+
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
 function getCategoryIcon(category) {

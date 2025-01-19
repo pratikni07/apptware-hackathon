@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Titles from "./Titles";
-import AnimationSunburst from "./AnimationSunburst";
 import { RefreshCcw } from "lucide-react";
 import {
   fetchUserData,
@@ -10,6 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import CategoryTitles from "./CategoryTitles";
+import SystemUsage from "./SystemUsage";
 
 const Dashboard = () => {
   const tabs = ["Windows", "MacOS", "Linux"];
@@ -44,16 +44,9 @@ const Dashboard = () => {
   const linuxCategory = useSelector((state) => state.activity.linuxCategory);
   const macCategory = useSelector((state) => state.activity.macCategory);
 
-  // console.log();
-  console.log("categories in dash", winCategory, linuxCategory, macCategory);
-
-
-   const windowsMatrix = useSelector((state) => state.activity.windowsMatrix);
-    const linuxMatrix = useSelector((state) => state.activity.linuxMatrix);
-    const macMatrix = useSelector((state) => state.activity.macMatrix);
-
-    console.log('matrix in dash')
-    console.log(windowsMatrix, linuxMatrix, macMatrix);
+  const windowsMatrix = useSelector((state) => state.activity.windowsMatrix);
+  const linuxMatrix = useSelector((state) => state.activity.linuxMatrix);
+  const macMatrix = useSelector((state) => state.activity.macMatrix);
 
   useEffect(() => {
     const data = {
@@ -79,7 +72,19 @@ const Dashboard = () => {
     dispatch(fetchCategoryData(userId));
   };
 
-  // Function to get the appropriate window data based on active tab
+  const getMetricData = () => {
+    switch (activeTab) {
+      case "Linux":
+        return linuxMatrix;
+      case "MacOS":
+        return macMatrix;
+      case "Windows":
+        return windowsMatrix;
+      default:
+        return windowsMatrix;
+    }
+  };
+
   const getCategoryData = () => {
     switch (activeTab) {
       case "Linux":
@@ -123,21 +128,26 @@ const Dashboard = () => {
   const lastName =
     user?.lastName.charAt(0).toUpperCase() + user?.lastName.slice(1);
 
+  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const isOwnProfile =
+    storedUser.firstname === firstName && storedUser.lastname === lastName;
+
   return (
     <div className="bg-[#1c1c1c]/80 flex justify-center items-center min-h-screen p-6 px-20">
       <div className="bg-[#1c1c1c] w-full rounded-lg">
         <div className="p-6 flex items-center justify-between">
           <div>
             <div className="text-white text-4xl">
-              Hey there,{" "}
+              {isOwnProfile ? <>Hey there, </> : <>This is </>}
               <span className="underline decoration-pink-500">
                 {firstName} {lastName}
               </span>
-              ! 👋
+              !
             </div>
+
             <div className="flex items-center gap-4 mt-6">
               <div className="text-zinc-300 text-xl">
-                Your activity for{" "}
+                {isOwnProfile ? "Your" : "Their"} activity for{" "}
                 <span className="underline decoration-indigo-500">
                   {month} {day}, {year}
                 </span>{" "}
@@ -152,10 +162,10 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
+          <SystemUsage metricData={getMetricData()} activeOS={activeTab} />
         </div>
 
         <div>
-          {/* Tab Navigation */}
           <div className="border-b border-gray-700">
             <nav className="flex -mb-px">
               {tabs.map((tab) => (
@@ -179,7 +189,6 @@ const Dashboard = () => {
             </nav>
           </div>
 
-          {/* Tab Content */}
           <div className="border-t border-zinc-700 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
             <div className="w-full max-w-md p-6 rounded-lg">
               <h2 className="text-xl text-white mb-4">User behaviour</h2>
@@ -191,7 +200,6 @@ const Dashboard = () => {
                 Breakdown in categories
               </h2>
               <CategoryTitles windowData={getCategoryData()} />
-              {/* <AnimationSunburst /> */}
             </div>
           </div>
         </div>

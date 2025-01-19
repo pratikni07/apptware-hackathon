@@ -1,17 +1,34 @@
-import React, { useState } from "react";
-import { ChevronDown, ChevronUp, Eye } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Eye } from "lucide-react";
+import { apiConnector } from "../services/apiconnector";
+import { endpoints } from "../services/apis";
+import { Link } from "react-router-dom";
 
 const AdminPort = () => {
-  const users = [
-    { id: 1, name: "Sarah Johnson", role: "Product Designer" },
-    { id: 2, name: "Michael Chen", role: "Developer" },
-    { id: 3, name: "Emma Williams", role: "Marketing Manager" },
-    { id: 4, name: "James Lee", role: "UX Designer" },
-    { id: 5, name: "Olivia Martin", role: "Frontend Developer" },
-    { id: 6, name: "Liam Scott", role: "Backend Developer" },
-  ];
-
+  const [users, setUsers] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const user = localStorage.getItem("user");
+  const companyId = JSON.parse(user).companyId;
+
+  const fetchUsers = async () => {
+    try {
+      const response = await apiConnector(
+        "POST",
+        `${endpoints.GET_EMPLOYEES_API}/${companyId}`
+      );
+      return response?.data?.data || [];
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers().then((data) => {
+      setUsers(data);
+    });
+  }, [companyId]);
 
   const toggleView = () => {
     setIsExpanded(!isExpanded);
@@ -35,45 +52,40 @@ const AdminPort = () => {
         <div className="space-y-4">
           {users.slice(0, isExpanded ? users.length : 4).map((user) => (
             <div
-              key={user.id}
+              key={user?._id}
               className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors"
             >
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-zinc-600 rounded-full overflow-hidden">
                   <img
-                    src={`/api/placeholder/48/48`}
-                    alt={`${user.name}'s profile`}
+                    src={user?.image}
+                    alt={`${user.firstName} ${user.lastName}`}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div>
-                  <h3 className="text-white font-medium">{user.name}</h3>
-                  <p className="text-zinc-400 text-sm">{user.role}</p>
+                  <h3 className="text-white font-medium">
+                    {user?.firstName} {user?.lastName}
+                  </h3>
+                  <p className="text-zinc-400 text-sm">Employee</p>
                 </div>
               </div>
-              <button
-                variant="outline"
-                className="flex items-center space-x-2  bg-indigo-700 text-zinc-100 py-3 px-4 rounded-xl hover:bg-indigo-600 font-medium"
-              >
-                <Eye className="w-4 h-4" />
-                <span>View Activity</span>
-              </button>
+              <Link to={`/dashboard/${user?._id}`}>
+                <button className="flex items-center space-x-2 bg-indigo-700 text-zinc-100 py-3 px-4 rounded-xl hover:bg-indigo-600 font-medium">
+                  <Eye className="w-4 h-4" />
+                  <span>View Activity</span>
+                </button>
+              </Link>
             </div>
           ))}
         </div>
 
-        <div className="flex">
-          <button
-            onClick={toggleView}
-            className="mt-2 flex items-center justify-center py-3 px-2 text-gray-400 hover:text-white transition-colors border border-gray-400 hover:border-white rounded-lg"
-          >
-            <span className="mr-1">
-              {" "}
-              {isExpanded ? "Show Less" : "Show More"}
-            </span>
-            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-        </div>
+        <button
+          onClick={toggleView}
+          className="w-full mt-4 text-zinc-100 bg-indigo-700 py-2 rounded-xl hover:bg-indigo-600 transition-colors font-medium"
+        >
+          {isExpanded ? "Show Less" : "Show More"}
+        </button>
       </div>
     </div>
   );

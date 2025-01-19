@@ -107,8 +107,16 @@ export function login(email, password, navigate) {
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      // console.log("account type", response.data.user.accountType);
+      dispatch(setLoading(false));
+      if (response.data.user.accountType === "Admin") {
+        navigate("/admin");
+        dispatch(setLoading(false));
 
-      console.log('id', response.data.user._id);
+        return;
+      }
+
+      console.log("id", response.data.user._id);
       navigate(`/dashboard/${response.data.user._id}`);
     } catch (error) {
       console.log("LOGIN API ERROR............", error);
