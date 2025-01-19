@@ -6,10 +6,10 @@ const activityController = require("../controller/activity.controller");
 const authMiddleware = require("../middlewares/authMiddleware");
 const UserActivityController = require("../controller/userActivity");
 // Protect all routes
-router.use(authMiddleware);
+
 
 // Record new activity
-router.post("/record", activityController.recordActivity);
+router.post("/record",authMiddleware, activityController.recordActivity);
 
 // Get activity history with filters
 router.get("/history", activityController.getActivityHistory);
