@@ -32,10 +32,10 @@ const UserActivityController = {
           {
             userId,
             "system.platform": platform,
-            // timestamp: {
-            //   $gte: new Date(new Date().setHours(0, 0, 0)), // Start of the day
-            //   $lt: new Date(new Date().setHours(23, 59, 59)), // End of the day
-            // },
+            timestamp: {
+              $gte: new Date(new Date().setHours(0, 0, 0)), // Start of the day
+              $lt: new Date(new Date().setHours(23, 59, 59)), // End of the day
+            },
           },
           null, // No specific fields to project
           { sort: { timestamp: -1 } } // Sort by timestamp descending to get the latest
